@@ -8,6 +8,21 @@
     gap: 2.5rem;
 }
 
+.hero-section {
+    width: 100%;
+    min-height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.typewriter-text {
+    font-size: 1.8rem;
+    color: var(--neon-green);
+    font-weight: 700;
+}
+
 .profile-section {
     display: flex;
     flex-direction: column;
@@ -19,13 +34,48 @@
 .links-section {
     width: 100%;
     display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+}
+
+.bento-section, .projects-section {
+    width: 100%;
+    display: flex;
     flex-direction: column;
+    gap: 1.5rem;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 1rem;
 }
 
-/* Mobile-first adjustments, though base layout is already mobile-optimized */
+.projects-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Mobile-first adjustments */
 @media (max-width: 360px) {
     .container {
         padding: 2rem 1.25rem;
+    }
+}
+
+/* Tablet & Desktop Layout */
+@media (min-width: 768px) {
+    .container {
+        max-width: 1000px;
+        padding: 4rem 2rem;
+    }
+
+    /* True Bento Box layout for larger screens */
+    .bento-grid, .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
     }
 }

@@ -20,12 +20,22 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding: 2rem 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Subtle glow at the top for premium feel */
     background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 102, 0.05) 0%, transparent 60%);
     background-repeat: no-repeat;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.light-theme {
+    --bg-color: #f8fafc;
+    --text-primary: #18181b;
+    --text-secondary: rgba(24, 24, 27, 0.7);
+    --glass-bg: rgba(0, 0, 0, 0.05);
+    --glass-border: rgba(0, 0, 0, 0.1);
 }
 
 a {
