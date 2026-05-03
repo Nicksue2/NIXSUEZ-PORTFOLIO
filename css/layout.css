@@ -1,0 +1,31 @@
+.container {
+    width: 100%;
+    max-width: 480px;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+}
+
+.links-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Mobile-first adjustments, though base layout is already mobile-optimized */
+@media (max-width: 360px) {
+    .container {
+        padding: 2rem 1.25rem;
+    }
+}
