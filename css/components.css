@@ -17,6 +17,22 @@
     overflow: hidden;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.nav-logo {
+    height: 32px;
+    width: 32px;
+    border-radius: 6px;
+    object-fit: contain;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+    display: block;
+}
+
+.profile-avatar:hover .nav-logo {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.4));
 }
 
 .profile-avatar::after {
@@ -67,11 +83,11 @@
 
 .icon-btn:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(0, 255, 102, 0.4);
+    border-color: rgba(var(--accent-rgb), 0.4);
     /* Subtle pop up effect */
     transform: translateY(-4px);
     /* Neon green glow */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 255, 102, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--accent-rgb), 0.2);
 }
 
 .icon-btn svg {
@@ -81,36 +97,10 @@
 
 .icon-btn:hover svg {
     color: var(--neon-green);
-    filter: drop-shadow(0 0 8px rgba(0, 255, 102, 0.5));
+    filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.5));
 }
 
-/* Theme Toggle Button */
-.theme-btn {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-    z-index: 100;
-}
 
-.theme-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.05);
-    color: var(--neon-green);
-    box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
-}
 
 /* Bento & Project Cards */
 .section-title {
@@ -133,8 +123,8 @@
 
 .bento-card:hover, .project-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(0, 255, 102, 0.4);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 15px rgba(0, 255, 102, 0.15);
+    border-color: rgba(var(--accent-rgb), 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 15px rgba(var(--accent-rgb), 0.15);
 }
 
 .bento-card h3, .project-content h3 {
@@ -171,8 +161,8 @@
 
 .status-badge.live {
     color: var(--neon-green);
-    background: rgba(0, 255, 102, 0.05);
-    border: 1px solid rgba(0, 255, 102, 0.2);
+    background: rgba(var(--accent-rgb), 0.05);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
 }
 
 .status-badge.localhost {
@@ -220,5 +210,23 @@
 }
 
 .project-link:hover {
-    text-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+    text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5);
+}
+
+.card-image-wrapper img {
+    object-fit: cover;
+    object-position: top;
+    width: 100%;
+    height: 100%;
+}
+
+/* Isolated Red CTA for Contact */
+#submit-btn.submit-btn {
+    background: var(--cta-red);
+    box-shadow: 0 12px 24px rgba(var(--cta-red-rgb), 0.3);
+}
+
+#submit-btn.submit-btn:hover {
+    background: #FF5252;
+    box-shadow: 0 16px 32px rgba(var(--cta-red-rgb), 0.4);
 }

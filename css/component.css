@@ -1,51 +1,164 @@
-.avatar-placeholder {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+/* ============================================================
+   COMPONENTS.CSS — Reusable UI Components
+   (Profile, Buttons, Cards, Badges — supplemental to layout.css)
+   ============================================================ */
+
+/* ─── PROFILE AVATAR — supplemental hover state ─── */
+.profile-avatar {
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-avatar::before {
+    content: 'NA';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: inherit;
+    font-weight: inherit;
+    background: rgba(0,0,0,0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+}
+
+/* ─── TAG PILL ─── */
+.tag {
+    cursor: default;
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    border-color: var(--glass-border-hover);
+    color: var(--text-primary);
+}
+
+/* ─── STATUS BADGE ─── */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.status-badge.live {
+    color: rgb(var(--color-green));
+    background: rgba(var(--color-green), 0.06);
+    border: 1px solid rgba(var(--color-green), 0.2);
+}
+
+.status-badge.localhost {
+    color: var(--text-secondary);
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 32px;
-    font-weight: 600;
-    margin-bottom: 8px;
 }
 
-.profile-name {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.5px;
-}
-
-.profile-bio {
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-/* Authentic Glassmorphism Buttons */
+/* ─── GLASS BUTTON (utility class) ─── */
 .glass-btn {
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    height: 48px; /* Slightly taller for easy tapping on mobile, but still sleek */
-    padding: 0 16px;
-    border-radius: 10px;
+    height: 48px;
+    padding: 0 1.25rem;
+    border-radius: 12px;
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
     text-decoration: none;
-    font-size: 15px;
+    font-size: 0.9rem;
     font-weight: 500;
-    transition: var(--transition-smooth);
+    letter-spacing: 0.02em;
+    transition: all 0.35s ease;
+    cursor: none;
 }
 
-.glass-btn:hover, .glass-btn:focus {
-    background: rgba(0, 255, 102, 0.08);
-    border-color: rgba(0, 255, 102, 0.3);
-    box-shadow: 0 0 12px rgba(0, 255, 102, 0.15);
+.glass-btn:hover,
+.glass-btn:focus {
+    background: rgba(var(--accent-rgb), 0.07);
+    border-color: rgba(var(--accent-rgb), 0.3);
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.12);
     transform: translateY(-2px);
     outline: none;
+}
+
+/* ─── SECTION DIVIDER ─── */
+.section-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--glass-border), transparent);
+    margin: 2rem 0;
+}
+
+/* ─── TOOLTIP (optional utility) ─── */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 0.4rem 0.8rem;
+    background: var(--text-primary);
+    color: var(--bg-color);
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
+}
+
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ─── ICON BUTTON (generic 48x48 glass button) ─── */
+.icon-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+}
+
+.icon-btn:hover {
+    background: rgba(var(--accent-rgb), 0.06);
+    border-color: rgba(var(--accent-rgb), 0.35);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2), 0 0 16px rgba(var(--accent-rgb), 0.18);
+}
+
+.icon-btn svg {
+    color: var(--text-secondary);
+    transition: color 0.3s ease, filter 0.3s ease;
+}
+
+.icon-btn:hover svg {
+    color: var(--accent);
+    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.5));
 }

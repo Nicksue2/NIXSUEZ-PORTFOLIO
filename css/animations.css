@@ -1,7 +1,22 @@
+/* ============================================================
+   ANIMATIONS.CSS — Motion, Micro-interactions, Transitions
+   ============================================================ */
+
+/* ─── PAGE LOAD INITIAL STATES ─── */
+/* 
+   GSAP will animate these FROM hidden TO visible on load.
+   Setting initial opacity here prevents flash-of-content.
+*/
+.hero-text-wrapper > * {
+    will-change: transform, opacity;
+}
+
+/* ─── SCROLL REVEAL ─── */
 .reveal {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity;
 }
 
 .reveal.active {
@@ -9,13 +24,181 @@
     transform: translateY(0);
 }
 
-/* Typewriter cursor effect */
+/* ─── TYPEWRITER CURSOR ─── */
 .typewriter-text::after {
     content: '|';
+    color: var(--accent-primary);
     animation: blink 1s step-end infinite;
+    margin-left: 2px;
+    font-weight: 300;
 }
 
 @keyframes blink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    50%       { opacity: 0; }
+}
+
+/* ─── STATS NUMBER TICK ANIMATION ─── */
+.stat-number {
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.stat-item:hover .stat-number {
+    color: var(--accent-primary);
+}
+
+/* ─── PROCESS STEP CONNECTOR LINE ─── */
+@media (min-width: 901px) {
+    .process-grid {
+        position: relative;
+    }
+    .process-grid::after {
+        content: '';
+        position: absolute;
+        top: 50px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--glass-border), transparent);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .process-step {
+        z-index: 1;
+    }
+}
+
+/* ─── CARD HOVER: CLIP SWEEP ─── */
+.bento-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.bento-card:hover::after {
+    opacity: 1;
+}
+
+/* ─── SCRAMBLE TEXT TARGET ─── */
+.scramble-target {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── MAGNETIC BUTTON EFFECT ─── */
+.primary-btn,
+.ghost-btn {
+    will-change: transform;
+}
+
+/* ─── SECTION ENTRY ANIMATIONS ─── */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── AVAILABILITY DOT PULSE ─── */
+@keyframes pulse-dot {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0);
+    }
+}
+
+/* ─── TIMELINE DOT GLOW ─── */
+.timeline-dot {
+    animation: dotGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes dotGlow {
+    from { box-shadow: 0 0 8px var(--accent-glow); }
+    to   { box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5); }
+}
+
+/* ─── MARQUEE PAUSE ON HOVER ─── */
+.marquee-wrapper:hover .marquee-track {
+    animation-play-state: paused;
+}
+
+/* ─── CARD LINK ARROW ANIMATION ─── */
+.card-link svg {
+    transition: transform 0.3s ease;
+}
+
+.card-link:hover svg {
+    transform: translate(3px, -3px);
+}
+
+/* ─── GLASS ICON RIPPLE ─── */
+.glass-icon {
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.4s ease;
+}
+
+.glass-icon:hover::before {
+    transform: scale(1.5);
+}
+
+/* ─── SCROLL TEXT (hero indicator) ─── */
+.scroll-text {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+/* ─── FLOATING NAV LINK UNDERLINE ─── */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    border-radius: 1px;
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 60%;
+}
+
+/* ─── FOOTER CTA HOVER ─── */
+.massive-contact .highlight-text {
+    position: relative;
+    display: inline-block;
+    transition: text-shadow 0.5s ease;
+}
+
+.footer-section:hover .massive-contact .highlight-text {
+    text-shadow: 0 0 40px rgba(var(--accent-rgb), 0.3);
 }
