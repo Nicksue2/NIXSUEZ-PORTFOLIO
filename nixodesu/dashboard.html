@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - Nixodesu</title>
+    <link rel="icon" href="assets/nixodesu-logo.png">
+    <link rel="apple-touch-icon" href="assets/nixodesu-logo.png">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <meta name="theme-color" content="#000000">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/theme.js"></script>
+</head>
+<body>
+    <header class="db-header">
+        <a href="index.html" class="back-btn">← Back</a>
+        <h1 class="db-title">Dashboard</h1>
+        <button class="theme-toggle-btn" id="theme-toggle-btn">
+            <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </button>
+    </header>
+
+    <main class="db-main">
+        <div class="overview-grid">
+            <div class="stat-card glass-panel">
+                <span class="stat-card-label">Longest Streak</span>
+                <span class="stat-card-val val-green" id="db-streak">0</span>
+                <span class="stat-card-sub">Answers in a row</span>
+            </div>
+            <div class="stat-card glass-panel">
+                <span class="stat-card-label">Total Answers</span>
+                <span class="stat-card-val val-white" id="db-total">0</span>
+                <span class="stat-card-sub">Across all sessions</span>
+            </div>
+            <div class="stat-card glass-panel">
+                <span class="stat-card-label">Accuracy</span>
+                <span class="stat-card-val val-white" id="db-accuracy">0%</span>
+                <span class="stat-card-sub">Overall precision</span>
+            </div>
+        </div>
+
+        <section class="db-section">
+            <h2 class="db-section-title">Character Mastery</h2>
+            <div class="kana-list-panel glass-panel">
+                <div class="kana-list-tabs">
+                    <button class="list-tab-btn active" id="tab-hiragana">Hiragana</button>
+                    <button class="list-tab-btn" id="tab-katakana">Katakana</button>
+                </div>
+                <div class="kana-breakdown" id="kana-breakdown-container">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section class="db-section danger-zone">
+            <h2 class="db-section-title" style="color:var(--red);">Danger Zone</h2>
+            <div class="glass-panel" style="padding: 24px; border-color: rgba(255, 59, 63, 0.4);">
+                <p style="margin-bottom: 16px; color: var(--text-2);">Permanently delete all mastery data and progress. This action cannot be undone.</p>
+                <button class="danger-btn" id="init-reset-btn" style="max-width: 240px; margin: 0;">Reset All Statistics</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay hidden" id="reset-modal">
+        <div class="modal-content glass-panel">
+            <h2 style="color: var(--red); margin-bottom: 12px;">Stop — Are you Sure?</h2>
+            <p style="color: var(--text-2); margin-bottom: 20px; line-height: 1.5;">This will permanently wipe your streak, correct answers, and all individual character mastery data. To confirm, please type <strong>DELETE</strong> below.</p>
+            <input type="text" id="delete-verify-input" placeholder="Type DELETE..." style="width: 100%; padding: 12px; margin-bottom: 16px; background: var(--accent); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-m); outline: none; transition: border-color 0.3s;">
+            <div style="display: flex; gap: 12px;">
+                <button class="ghost-btn" id="cancel-reset-btn" style="flex: 1;">Cancel</button>
+                <button class="primary-btn" id="confirm-reset-btn" style="flex: 1; background: var(--red); opacity: 0.4;" disabled>Wipe Data</button>
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <script>
+        // Init theme
+        let theme = localStorage.getItem('nixodesu_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        const icon = document.getElementById('theme-icon');
+        icon.innerHTML = theme === 'dark' ? 
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : 
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+
+        document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('nixodesu_theme', theme);
+            icon.innerHTML = theme === 'dark' ? 
+                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : 
+                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        });
+
+        // Load Stats
+        let stats = JSON.parse(localStorage.getItem('nixodesu_stats')) || {
+            streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} }
+        };
+
+        let currentTab = 'hiragana';
+
+        function renderDashboard() {
+            let totalAnswers = 0;
+            let totalAccCorrect = 0;
+
+            Object.values(stats.characterStats.hiragana || {}).forEach(s => { totalAnswers += (s.c + s.i); totalAccCorrect += s.c; });
+            Object.values(stats.characterStats.katakana || {}).forEach(s => { totalAnswers += (s.c + s.i); totalAccCorrect += s.c; });
+
+            document.getElementById('db-streak').textContent = stats.streak;
+            document.getElementById('db-total').textContent = totalAnswers;
+            document.getElementById('db-accuracy').textContent = totalAnswers === 0 ? '0%' : Math.round((totalAccCorrect/totalAnswers)*100) + '%';
+
+            renderKanaList();
+        }
+
+        function renderKanaList() {
+            const container = document.getElementById('kana-breakdown-container');
+            container.innerHTML = '';
+            
+            const charStats = stats.characterStats[currentTab] || {};
+            const chars = Object.keys(charStats).sort((a, b) => {
+                const pA = charStats[a].c / (charStats[a].c + charStats[a].i);
+                const pB = charStats[b].c / (charStats[b].c + charStats[b].i);
+                return pA - pB; // sort weakest first
+            });
+
+            if (chars.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;text-align:center;">No data collected yet. Start practicing!</p>';
+                return;
+            }
+
+            chars.forEach(char => {
+                const s = charStats[char];
+                const total = s.c + s.i;
+                const pct = total === 0 ? 0 : Math.round((s.c / total) * 100);
+                
+                const row = document.createElement('div');
+                row.className = 'kana-row';
+                
+                let barColor = 'var(--green)';
+                if (pct < 40) barColor = 'var(--red)';
+                else if (pct < 80) barColor = '#FF9500';
+
+                row.innerHTML = `
+                    <div class="kana-row-left">
+                        <span class="kana-char">${char}</span>
+                        <span class="kana-counts">${s.c}✓ ${s.i}✗ ${s.h || 0}💡</span>
+                    </div>
+                    <div class="kana-row-right">
+                        <div class="mini-bar-track">
+                            <div class="mini-bar-fill" style="width: ${pct}%; background: ${barColor};"></div>
+                        </div>
+                        <span class="kana-pct" style="color: ${barColor}">${pct}%</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        document.getElementById('tab-hiragana').addEventListener('click', (e) => {
+            currentTab = 'hiragana';
+            document.getElementById('tab-hiragana').classList.add('active');
+            document.getElementById('tab-katakana').classList.remove('active');
+            renderKanaList();
+        });
+
+        document.getElementById('tab-katakana').addEventListener('click', (e) => {
+            currentTab = 'katakana';
+            document.getElementById('tab-katakana').classList.add('active');
+            document.getElementById('tab-hiragana').classList.remove('active');
+            renderKanaList();
+        });
+
+        const resetModal = document.getElementById('reset-modal');
+        const verifyInput = document.getElementById('delete-verify-input');
+        const confirmBtn = document.getElementById('confirm-reset-btn');
+
+        document.getElementById('init-reset-btn').addEventListener('click', () => {
+            resetModal.classList.remove('hidden');
+            verifyInput.value = '';
+            verifyInput.focus();
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.4';
+        });
+
+        document.getElementById('cancel-reset-btn').addEventListener('click', () => {
+            resetModal.classList.add('hidden');
+        });
+
+        verifyInput.addEventListener('input', (e) => {
+            if (e.target.value === 'DELETE') {
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
+                verifyInput.style.borderColor = 'var(--red)';
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = '0.4';
+                verifyInput.style.borderColor = 'var(--border)';
+            }
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            localStorage.removeItem('nixodesu_stats');
+            location.reload();
+        });
+
+        renderDashboard();
+    </script>
+</body>
+</html>

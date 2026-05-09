@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nixodesu - Premium Kana Learning</title>
+    <link rel="icon" href="assets/nixodesu-logo.png">
+    <link rel="apple-touch-icon" href="assets/nixodesu-logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050505">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/theme.js"></script>
+    <style>
+        /* Landing Page Specific Styles */
+        body {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; /* Prevent scroll on landing */
+        }
+        
+        .landing-container {
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: 40px; padding: 40px; border-radius: 32px;
+            background: var(--glass); border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            z-index: 10; opacity: 0; transform: scale(0.95) translateY(20px);
+            animation: containerIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 2s;
+        }
+
+        @keyframes containerIn {
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .hero-logo-box {
+            width: 120px; height: 120px; border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-strong);
+        }
+        .hero-logo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .landing-title { font-size: 48px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+        .landing-subtitle { font-size: 18px; color: var(--text-2); max-width: 400px; line-height: 1.5; font-weight: 400; }
+
+        .landing-actions {
+            display: flex; gap: 16px; width: 100%;
+        }
+
+        .btn-large {
+            flex: 1; padding: 20px; border-radius: var(--radius-xl);
+            font-size: 18px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s var(--ease); border: none;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        
+        .btn-start {
+            background: var(--primary); color: #fff;
+            box-shadow: 0 8px 20px var(--primary-glow);
+        }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 12px 25px var(--primary-glow); opacity: 0.9; }
+        .btn-start:active { transform: scale(0.95); }
+
+        .btn-dash {
+            background: var(--accent); color: var(--text-1); border: 1px solid var(--border);
+        }
+        .btn-dash:hover { background: var(--glass-hover); border-color: var(--border-strong); transform: translateY(-3px); }
+        .btn-dash:active { transform: scale(0.95); }
+
+        /* Loading Animation Layer */
+        .loader-overlay {
+            position: fixed; inset: 0; background: var(--bg);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease;
+        }
+        .loader-logo-wrap {
+            position: relative; width: 80px; height: 80px;
+        }
+        .loader-logo-wrap img {
+            width: 72px; height: 72px; border-radius: 20px;
+            object-fit: cover; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .loader-ring {
+            width: 80px; height: 80px; position: absolute; top: 0; left: 0;
+            border: 3px solid transparent; border-top-color: var(--primary);
+            border-right-color: rgba(255,85,0,0.3);
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        .loader-text {
+            margin-top: 24px; font-size: 14px; font-weight: 600; color: var(--text-2); letter-spacing: 4px;
+            text-transform: uppercase; animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* Small Theme Toggle */
+        .landing-theme-toggle {
+            position: absolute; top: 32px; right: 32px;
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 50%; width: 50px; height: 50px; padding: 0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s var(--ease); z-index: 100;
+        }
+        .landing-theme-toggle:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-color: var(--border-strong); }
+        .landing-theme-toggle:active { transform: scale(0.9); }
+        .landing-theme-toggle svg { width: 22px; height: 22px; color: var(--text-1); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .landing-theme-toggle:hover svg { transform: rotate(20deg) scale(1.15); }
+
+        @media (max-width: 640px) {
+            .landing-container { padding: 32px 24px; width: 90%; }
+            .landing-title { font-size: 36px; }
+            .landing-actions { flex-direction: column; }
+            .landing-theme-toggle { top: 20px; right: 20px; width: 44px; height: 44px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Animation -->
+    <div class="loader-overlay" id="loader">
+        <div class="loader-logo-wrap">
+            <div class="loader-ring"></div>
+            <img src="assets/nixodesu-logo.png" alt="Nixodesu Logo">
+        </div>
+        <div class="loader-text">Nixodesu</div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="landing-theme-toggle" id="theme-btn" aria-label="Toggle Theme">
+        <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+    </button>
+
+    <!-- Main Content -->
+    <div class="landing-container">
+        <div class="hero-logo-box">
+            <img src="assets/nixodesu-logo.png" alt="Nixodesu Logo">
+        </div>
+        <div>
+            <h1 class="landing-title">Nixodesu</h1>
+            <p class="landing-subtitle">Master Hiragana and Katakana through an elegant, distraction-free learning experience.</p>
+        </div>
+
+        <div class="landing-actions">
+            <button class="btn-large btn-dash" onclick="location.href='dashboard.html'">
+                Dashboard
+            </button>
+            <button class="btn-large btn-start" onclick="location.href='practice.html'">
+                Start Practice →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Loader Logic
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 600);
+            }, 1500); // 1.5s forced minimum loading delay for smooth effect
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
