@@ -10,6 +10,8 @@
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="js/theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
 </head>
 <body>
     <header class="db-header">
@@ -94,14 +96,19 @@
         // Init theme
 
 
-        // Load Stats
-        let stats = JSON.parse(localStorage.getItem('nixodesu_stats')) || {
-            streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} }
-        };
-
+        let stats = null;
         let currentTab = 'hiragana';
 
+        function loadStats() {
+            stats = JSON.parse(localStorage.getItem('nixodesu_stats')) || {
+                streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} }
+            };
+            renderDashboard();
+        }
+        window.loadStats = loadStats;
+
         function renderDashboard() {
+            if (!stats) return;
             let totalAnswers = 0;
             let totalAccCorrect = 0;
 
@@ -296,7 +303,7 @@
             location.reload();
         });
 
-        renderDashboard();
+        loadStats();
     </script>
 </body>
 </html>

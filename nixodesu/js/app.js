@@ -93,13 +93,24 @@ if ('speechSynthesis' in window) {
     loadVoices();
 }
 
-let stats = JSON.parse(localStorage.getItem('nixodesu_stats'));
-if (!stats) {
-    stats = { streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} } };
+let stats = null;
+
+function loadStats() {
+    stats = JSON.parse(localStorage.getItem('nixodesu_stats'));
+    if (!stats) {
+        stats = { streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} } };
+    }
+    if (!stats.characterStats) stats.characterStats = { hiragana: {}, katakana: {} };
+    if (!stats.characterStats.hiragana) stats.characterStats.hiragana = {};
+    if (!stats.characterStats.katakana) stats.characterStats.katakana = {};
+    
+    if (document.getElementById('streak-val')) {
+        document.getElementById('streak-val').textContent = stats.streak;
+        document.getElementById('score-val').textContent = stats.totalCorrect;
+    }
 }
-if (!stats.characterStats) stats.characterStats = { hiragana: {}, katakana: {} };
-if (!stats.characterStats.hiragana) stats.characterStats.hiragana = {};
-if (!stats.characterStats.katakana) stats.characterStats.katakana = {};
+window.loadStats = loadStats;
+loadStats(); // initial load
 
 // --- HAPTICS ---
 function haptic(pattern) {
@@ -145,11 +156,19 @@ const views = {
     quiz: document.getElementById('quiz-view')
 };
 
-function saveStats() {
+function saveStats(updatedChar = null, updatedType = null) {
     localStorage.setItem('nixodesu_stats', JSON.stringify(stats));
     if (document.getElementById('streak-val')) {
         document.getElementById('streak-val').textContent = stats.streak;
         document.getElementById('score-val').textContent = stats.totalCorrect;
+    }
+    
+    // Sync to Supabase if logged in
+    if (typeof window.updateSupabaseStats === 'function') {
+        window.updateSupabaseStats(stats);
+        if (updatedChar && updatedType) {
+            window.updateSupabaseKana(updatedType, updatedChar, stats.characterStats[updatedType][updatedChar]);
+        }
     }
 }
 
@@ -615,7 +634,7 @@ function initSwipeGestures() {
             cur.i++;
             cur.w = (cur.w || 0) + 1;
             stats.streak = 0;
-            saveStats();
+            saveStats(currentItem.j, currentType);
             isAnimating = true;
             const toast = document.getElementById('feedback-toast');
             toast.className = 'feedback-toast incorrect-toast';
@@ -631,7 +650,7 @@ function initSwipeGestures() {
                 stats.characterStats[currentType][currentItem.j] = {c:0, i:0, h:0, w:0};
             stats.characterStats[currentType][currentItem.j].h =
                 (stats.characterStats[currentType][currentItem.j].h || 0) + 1;
-            saveStats();
+            saveStats(currentItem.j, currentType);
             const hintText = currentCardMode === 'listen' ? currentItem.j : currentItem.r;
             const toast = document.getElementById('feedback-toast');
             toast.className = 'feedback-toast';
@@ -812,7 +831,7 @@ function handleAnswer(ans, btnEl=null, isDrawOverride=false) {
         queue.push(currentItem);
         originalQueueSize++; 
     }
-    saveStats();
+    saveStats(currentItem.j, currentType);
 
     const toast = document.getElementById('feedback-toast');
     toast.className = `feedback-toast ${isCorrect ? 'correct-toast' : 'incorrect-toast'}`;

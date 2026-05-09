@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - Nixodesu</title>
+    <link rel="icon" href="assets/nixodesu-logo.png">
+    <link rel="apple-touch-icon" href="assets/nixodesu-logo.png">
     <link rel="stylesheet" href="css/dashboard.css">
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/theme.js"></script>
 </head>
 <body>
     <header class="db-header">
         <a href="index.html" class="back-btn">← Back</a>
         <h1 class="db-title">Dashboard</h1>
         <button class="theme-toggle-btn" id="theme-toggle-btn">
-            <span id="theme-icon">🌙</span>
+            <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
         </button>
     </header>
 
@@ -49,6 +52,21 @@
             </div>
         </section>
 
+        <section class="db-section">
+            <h2 class="db-section-title">Category Win Rates</h2>
+            <div id="win-rate-container" class="win-rate-grid">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+        <section class="db-section">
+            <h2 class="db-section-title">Quick Review</h2>
+            <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+                <p style="color: var(--text-2); font-size: 14px; line-height: 1.5;">Start a focused 10-card session targeting your weakest characters, ranked by error score.</p>
+                <button class="primary-btn" id="quick-review-btn" style="max-width: 260px; margin: 0;">⚡ Quick Review (Weakest 10)</button>
+            </div>
+        </section>
+
         <section class="db-section danger-zone">
             <h2 class="db-section-title" style="color:var(--red);">Danger Zone</h2>
             <div class="glass-panel" style="padding: 24px; border-color: rgba(255, 59, 63, 0.4);">
@@ -74,21 +92,7 @@
 
     <script>
         // Init theme
-        let theme = localStorage.getItem('nixodesu_theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', theme);
-        const icon = document.getElementById('theme-icon');
-        icon.innerHTML = theme === 'dark' ? 
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : 
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
 
-        document.getElementById('theme-toggle-btn').addEventListener('click', () => {
-            theme = theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('nixodesu_theme', theme);
-            icon.innerHTML = theme === 'dark' ? 
-                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : 
-                '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
-        });
 
         // Load Stats
         let stats = JSON.parse(localStorage.getItem('nixodesu_stats')) || {
@@ -101,21 +105,25 @@
             let totalAnswers = 0;
             let totalAccCorrect = 0;
 
-            Object.values(stats.characterStats.hiragana || {}).forEach(s => { totalAnswers += (s.c + s.i); totalAccCorrect += s.c; });
-            Object.values(stats.characterStats.katakana || {}).forEach(s => { totalAnswers += (s.c + s.i); totalAccCorrect += s.c; });
+            const hStats = stats.characterStats?.hiragana || {};
+            const kStats = stats.characterStats?.katakana || {};
 
-            document.getElementById('db-streak').textContent = stats.streak;
+            Object.values(hStats).forEach(s => { totalAnswers += (s.c + s.i); totalAccCorrect += s.c; });
+            Object.values(kStats).forEach(s => { totalAnswers += (s.c + s.i); totalAccCorrect += s.c; });
+
+            document.getElementById('db-streak').textContent = stats.streak || 0;
             document.getElementById('db-total').textContent = totalAnswers;
             document.getElementById('db-accuracy').textContent = totalAnswers === 0 ? '0%' : Math.round((totalAccCorrect/totalAnswers)*100) + '%';
 
             renderKanaList();
+            renderWinRates();
         }
 
         function renderKanaList() {
             const container = document.getElementById('kana-breakdown-container');
             container.innerHTML = '';
             
-            const charStats = stats.characterStats[currentTab] || {};
+            const charStats = (stats.characterStats && stats.characterStats[currentTab]) || {};
             const chars = Object.keys(charStats).sort((a, b) => {
                 const pA = charStats[a].c / (charStats[a].c + charStats[a].i);
                 const pB = charStats[b].c / (charStats[b].c + charStats[b].i);
@@ -154,6 +162,92 @@
                 container.appendChild(row);
             });
         }
+
+        // --- WIN RATES per category ---
+        // Each group key maps its first char to the category for lookup
+        const KANA_CATEGORY_MAP = (() => {
+            const map = { hiragana: {}, katakana: {} };
+            // Build char→category lookup from the kana data structure inline
+            const hira = {
+                Basic: ["あ","い","う","え","お","か","き","く","け","こ","さ","し","す","せ","そ","た","ち","つ","て","と","な","に","ぬ","ね","の","は","ひ","ふ","へ","ほ","ま","み","む","め","も","や","ゆ","よ","ら","り","る","れ","ろ","わ","を","ん"],
+                Dakuten: ["が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で","ど","ば","び","ぶ","べ","ぼ","ぱ","ぴ","ぷ","ぺ","ぽ"],
+                Combinations: ["きゃ","きゅ","きょ","しゃ","しゅ","しょ","ちゃ","ちゅ","ちょ","にゃ","にゅ","にょ","ひゃ","ひゅ","ひょ","みゃ","みゅ","みょ","りゃ","りゅ","りょ","ぎゃ","ぎゅ","ぎょ","じゃ","じゅ","じょ","びゃ","びゅ","びょ","ぴゃ","ぴゅ","ぴょ"]
+            };
+            const kata = {
+                Basic: ["ア","イ","ウ","エ","オ","カ","キ","ク","ケ","コ","サ","シ","ス","セ","ソ","タ","チ","ツ","テ","ト","ナ","ニ","ヌ","ネ","ノ","ハ","ヒ","フ","ヘ","ホ","マ","ミ","ム","メ","モ","ヤ","ユ","ヨ","ラ","リ","ル","レ","ロ","ワ","ヲ","ン"],
+                Dakuten: ["ガ","ギ","グ","ゲ","ゴ","ザ","ジ","ズ","ゼ","ゾ","ダ","ヂ","ヅ","デ","ド","バ","ビ","ブ","ベ","ボ","パ","ピ","プ","ペ","ポ"],
+                Combinations: ["キャ","キュ","キョ","シャ","シュ","ショ","チャ","チュ","チョ","ニャ","ニュ","ニョ","ヒャ","ヒュ","ヒョ","ミャ","ミュ","ミョ","リャ","リュ","リョ","ギャ","ギュ","ギョ","ジャ","ジュ","ジョ","ビャ","ビュ","ビョ","ピャ","ピュ","ピョ"]
+            };
+            ['Basic','Dakuten','Combinations'].forEach(cat => {
+                hira[cat].forEach(c => map.hiragana[c] = cat);
+                kata[cat].forEach(c => map.katakana[c] = cat);
+            });
+            return map;
+        })();
+
+        function renderWinRates() {
+            const container = document.getElementById('win-rate-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const allStats = stats.characterStats || {};
+            const catLabels = { Basic: 'Basic', Dakuten: 'Dakuten', Combinations: 'Combos' };
+            const catIcons = { Basic: '🔤', Dakuten: '〝', Combinations: '🔗' };
+
+            ['hiragana','katakana'].forEach(type => {
+                const charStats = allStats[type] || {};
+                const catTotals = { Basic:{c:0,i:0}, Dakuten:{c:0,i:0}, Combinations:{c:0,i:0} };
+
+                Object.entries(charStats).forEach(([char, s]) => {
+                    const cat = KANA_CATEGORY_MAP[type][char];
+                    if (cat && catTotals[cat]) {
+                        catTotals[cat].c += (s.c || 0);
+                        catTotals[cat].i += (s.i || 0);
+                    }
+                });
+
+                Object.entries(catTotals).forEach(([cat, data]) => {
+                    const total = data.c + data.i;
+                    const pct = total === 0 ? null : Math.round((data.c / total) * 100);
+                    const isGold = pct !== null && pct >= 90;
+                    const color = pct === null ? 'var(--text-3)' : pct >= 90 ? '#FFD700' : pct >= 60 ? 'var(--green)' : 'var(--red)';
+                    const typeLabel = type === 'hiragana' ? 'ひ' : 'カ';
+                    const card = document.createElement('div');
+                    card.className = 'win-rate-card glass-panel' + (isGold ? ' gold-glow' : '');
+                    card.innerHTML = `
+                        <div class="wr-label">${typeLabel} ${catLabels[cat]}</div>
+                        <div class="wr-pct" style="color:${color}">${pct === null ? '—' : pct + '%'}</div>
+                        <div class="wr-sub">${total} attempts</div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // --- QUICK REVIEW (Weakest 10) ---
+        document.getElementById('quick-review-btn')?.addEventListener('click', () => {
+            const allStats = stats.characterStats || {};
+            const candidates = [];
+            ['hiragana','katakana'].forEach(type => {
+                Object.entries(allStats[type] || {}).forEach(([char, s]) => {
+                    const total = (s.c||0) + (s.i||0);
+                    const accuracy = total === 0 ? 0 : (s.c||0) / total;
+                    const errorScore = (s.w||0) + (s.i||0);
+                    candidates.push({ char, type, accuracy, errorScore });
+                });
+            });
+            if (candidates.length === 0) {
+                alert('No data yet! Go practice first to build your stats.');
+                return;
+            }
+            // Sort by worst accuracy, then highest error score
+            candidates.sort((a,b) => a.accuracy - b.accuracy || b.errorScore - a.errorScore);
+            const weakest = candidates.slice(0, 10);
+            // Encode to pass to practice page
+            const payload = JSON.stringify(weakest.map(c => ({ char: c.char, type: c.type })));
+            sessionStorage.setItem('nixodesu_quick_review', payload);
+            window.location.href = 'practice.html?mode=quickreview';
+        });
 
         document.getElementById('tab-hiragana').addEventListener('click', (e) => {
             currentTab = 'hiragana';
