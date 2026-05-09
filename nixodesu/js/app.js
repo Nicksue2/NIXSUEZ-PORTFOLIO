@@ -29,7 +29,7 @@ const kanaData = {
       "みゃ mya": [{j:"みゃ",r:"mya"},{j:"みゅ",r:"myu"},{j:"みょ",r:"myo"}],
       "りゃ rya": [{j:"りゃ",r:"rya"},{j:"りゅ",r:"ryu"},{j:"りょ",r:"ryo"}],
       "ぎゃ gya": [{j:"ぎゃ",r:"gya"},{j:"ぎゅ",r:"gyu"},{j:"ぎょ",r:"gyo"}],
-      "じゃ ja": [{j:"じゃ",r:"ja"},{j:"じゅ",r:"ju"},{j:"ジョ",r:"jo"}],
+      "じゃ ja": [{j:"じゃ",r:"ja"},{j:"じゅ",r:"ju"},{j:"じょ",r:"jo"}],
       "びゃ bya": [{j:"びゃ",r:"bya"},{j:"びゅ",r:"byu"},{j:"びょ",r:"byo"}],
       "ぴゃ pya": [{j:"ぴゃ",r:"pya"},{j:"ぴゅ",r:"pyu"},{j:"ぴょ",r:"pyo"}]
     }
@@ -63,7 +63,7 @@ const kanaData = {
       "ミャ mya": [{j:"ミャ",r:"mya"},{j:"ミュ",r:"myu"},{j:"ミョ",r:"myo"}],
       "リャ rya": [{j:"リャ",r:"rya"},{j:"リュ",r:"ryu"},{j:"リョ",r:"ryo"}],
       "ギャ gya": [{j:"ギャ",r:"gya"},{j:"ギュ",r:"gyu"},{j:"ギョ",r:"gyo"}],
-      "ジャ ja": [{j:"ジャ",r:"ja"},{j:"ジュ",r:"ju"},{j:"ジョ",r:"jo"}],
+      "ジャ ja": [{j:"ジャ",r:"ja"},{j:"ジュ",r:"ju"},{j:"じょ",r:"jo"}],
       "ビャ bya": [{j:"ビャ",r:"bya"},{j:"ビュ",r:"byu"},{j:"ビョ",r:"byo"}],
       "ピャ pya": [{j:"ピャ",r:"pya"},{j:"ピュ",r:"pyu"},{j:"ピョ",r:"pyo"}]
     }
@@ -81,6 +81,17 @@ let currentItem = null;
 let currentCardMode = null;
 let originalQueueSize = 0;
 let isAnimating = false;
+let jaVoice = null;
+
+// Load voices for iOS/Chrome
+function loadVoices() {
+    const voices = window.speechSynthesis.getVoices();
+    jaVoice = voices.find(v => v.lang.startsWith('ja')) || voices.find(v => v.name.includes('Japanese'));
+}
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+}
 
 let stats = JSON.parse(localStorage.getItem('nixodesu_stats'));
 if (!stats) {
@@ -89,6 +100,43 @@ if (!stats) {
 if (!stats.characterStats) stats.characterStats = { hiragana: {}, katakana: {} };
 if (!stats.characterStats.hiragana) stats.characterStats.hiragana = {};
 if (!stats.characterStats.katakana) stats.characterStats.katakana = {};
+
+// --- HAPTICS ---
+function haptic(pattern) {
+    if ('vibrate' in navigator) navigator.vibrate(pattern);
+}
+
+// --- SOUND FX via AudioContext ---
+let _audioCtx = null;
+function getAudioCtx() {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return _audioCtx;
+}
+function playSfx(type) {
+    try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        if (type === 'correct') {
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.06);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.18);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.25);
+        }
+    } catch(e) {}
+}
 
 // --- DOM ELEMENTS ---
 const views = {
@@ -169,7 +217,28 @@ function initApp() {
     }
 
     // Start
-    document.getElementById('start-btn')?.addEventListener('click', startPractice);
+    let _audioUnlocked = false; // Unlock only runs once per page load
+    document.getElementById('start-btn')?.addEventListener('click', () => {
+        if (!_audioUnlocked) {
+            _audioUnlocked = true;
+            // One-time iOS SpeechSynthesis unlock (silent)
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const unlock = new SpeechSynthesisUtterance('あ');
+                unlock.lang = 'ja-JP';
+                unlock.volume = 0.001; // essentially silent
+                if (jaVoice) unlock.voice = jaVoice;
+                window.speechSynthesis.speak(unlock);
+                window.speechSynthesis.resume();
+            }
+            // One-time iOS WebAudio unlock
+            try {
+                const ctx = getAudioCtx();
+                if (ctx.state === 'suspended') ctx.resume();
+            } catch(e) {}
+        }
+        startPractice();
+    });
     document.getElementById('end-session-btn')?.addEventListener('click', () => { switchView('setup'); renderGroups(); });
     
     // Typing Input
@@ -214,6 +283,9 @@ function initApp() {
     // Draw Setup
     initDrawing();
 
+    // Swipe Gestures
+    initSwipeGestures();
+
     // Review Actions
     document.getElementById('review-skip-btn')?.addEventListener('click', startQuizPhase);
     document.getElementById('review-next-btn')?.addEventListener('click', nextReviewCard);
@@ -231,6 +303,55 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+
+// --- QUICK REVIEW MODE ---
+// Triggered when arriving from dashboard with ?mode=quickreview
+(function checkQuickReview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') !== 'quickreview') return;
+
+    const raw = sessionStorage.getItem('nixodesu_quick_review');
+    if (!raw) return;
+    sessionStorage.removeItem('nixodesu_quick_review');
+
+    try {
+        const weakest = JSON.parse(raw); // [{char, type}, ...]
+        if (!weakest.length) return;
+
+        // Build a minimal queue directly from the weakest chars
+        const qrQueue = weakest.map(entry => {
+            // Find the full item in kanaData
+            let found = null;
+            const type = entry.type || 'hiragana';
+            Object.values(kanaData[type] || {}).forEach(col => {
+                Object.values(col).forEach(arr => {
+                    arr.forEach(item => {
+                        if (item.j === entry.char) found = item;
+                    });
+                });
+            });
+            return found;
+        }).filter(Boolean);
+
+        if (!qrQueue.length) return;
+
+        // iOS audio unlock
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance('あ');
+            u.lang = 'ja-JP'; u.volume = 0.01;
+            if (jaVoice) u.voice = jaVoice;
+            window.speechSynthesis.speak(u);
+            window.speechSynthesis.resume();
+        }
+
+        // Override queue and start quiz
+        queue = qrQueue;
+        originalQueueSize = queue.length;
+        // Use all active modes
+        setTimeout(() => startQuizPhase(), 300);
+    } catch(e) { console.error('Quick Review error:', e); }
+})();
 
 // --- THEME ---
 function initTheme() {
@@ -341,6 +462,24 @@ function renderGroups() {
 }
 
 // --- SESSION LOGIC ---
+function buildSRSQueue(pool, targetSize) {
+    // Give each item a weight: higher error score = more repetitions
+    const weighted = [];
+    pool.forEach(item => {
+        const s = stats.characterStats[currentType]?.[item.j] || {c:0, i:0, w:0};
+        // SRS weight: unseen=3, errorScore drives extra reps (max 5x)
+        const total = s.c + s.i;
+        const errorScore = s.w || (total === 0 ? 0 : Math.round((s.i / total) * 10));
+        const reps = Math.min(5, Math.max(1, 1 + Math.floor(errorScore / 2)));
+        for (let r = 0; r < reps; r++) weighted.push(item);
+    });
+    const result = [];
+    for (let i = 0; i < targetSize; i++) {
+        result.push(weighted[Math.floor(Math.random() * weighted.length)]);
+    }
+    return result;
+}
+
 function startPractice() {
     let pool = [];
     selectedGroups.forEach(g => {
@@ -354,13 +493,11 @@ function startPractice() {
     let targetSize = parseInt(document.getElementById('session-size').value) || 20;
     queue = [];
 
-    // Fill queue
     if (orderType === 'random') {
-        for(let i=0; i<targetSize; i++) {
-            queue.push(pool[Math.floor(Math.random() * pool.length)]);
-        }
+        // SRS-weighted random queue
+        queue = buildSRSQueue(pool, targetSize);
     } else {
-        // Focus (sort by lowest accuracy)
+        // Focus: sort by lowest accuracy, deterministic
         pool.sort((a,b) => {
             const sA = stats.characterStats[currentType]?.[a.j] || {c:0,i:0};
             const sB = stats.characterStats[currentType]?.[b.j] || {c:0,i:0};
@@ -368,17 +505,14 @@ function startPractice() {
             const pB = sB.c+sB.i===0 ? -1 : sB.c/(sB.c+sB.i);
             return pA - pB;
         });
-        for(let i=0; i<targetSize; i++) {
-            queue.push(pool[i % pool.length]);
-        }
-        queue.sort(() => Math.random() - 0.5); // Shuffle final selection
+        for(let i=0; i<targetSize; i++) queue.push(pool[i % pool.length]);
+        queue.sort(() => Math.random() - 0.5);
     }
 
     originalQueueSize = queue.length;
 
     const doReview = document.getElementById('review-cb')?.checked;
     if (doReview) {
-        // Distinct items for review
         const distinct = Array.from(new Set(queue.map(q=>JSON.stringify(q)))).map(s=>JSON.parse(s));
         reviewQueue = distinct;
         switchView('review');
@@ -450,6 +584,67 @@ function nextCard() {
     else if (currentCardMode === 'draw') setupDraw();
 }
 
+// --- SWIPE GESTURES on quiz view ---
+// Left = Hint | Down = Skip | (Right intentionally unused — user must answer)
+let _swipeStartX = 0, _swipeStartY = 0;
+function initSwipeGestures() {
+    const quizView = document.getElementById('quiz-view');
+    if (!quizView) return;
+
+    quizView.addEventListener('touchstart', e => {
+        _swipeStartX = e.changedTouches[0].clientX;
+        _swipeStartY = e.changedTouches[0].clientY;
+    }, {passive: true});
+
+    quizView.addEventListener('touchend', e => {
+        if (isAnimating || !currentItem) return;
+        const dx = e.changedTouches[0].clientX - _swipeStartX;
+        const dy = e.changedTouches[0].clientY - _swipeStartY;
+        const absDx = Math.abs(dx), absDy = Math.abs(dy);
+        const maxDelta = Math.max(absDx, absDy);
+        if (maxDelta < 60) return; // too small, ignore
+
+        if (absDy > absDx && dy > 0) {
+            // ↓ Swipe Down = Skip (counts as a miss, moves to next card)
+            haptic([50, 80, 50]);
+            playSfx('incorrect');
+            if (!stats.characterStats[currentType]) stats.characterStats[currentType] = {};
+            if (!stats.characterStats[currentType][currentItem.j])
+                stats.characterStats[currentType][currentItem.j] = {c:0, i:0, h:0, w:0};
+            const cur = stats.characterStats[currentType][currentItem.j];
+            cur.i++;
+            cur.w = (cur.w || 0) + 1;
+            stats.streak = 0;
+            saveStats();
+            isAnimating = true;
+            const toast = document.getElementById('feedback-toast');
+            toast.className = 'feedback-toast incorrect-toast';
+            toast.textContent = `⏭ SKIPPED — ${currentItem.r}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => { isAnimating = false; toast.classList.add('hidden'); nextCard(); }, 1000);
+
+        } else if (absDx > absDy && dx < 0) {
+            // ← Swipe Left = Show Hint
+            haptic(25);
+            if (!stats.characterStats[currentType]) stats.characterStats[currentType] = {};
+            if (!stats.characterStats[currentType][currentItem.j])
+                stats.characterStats[currentType][currentItem.j] = {c:0, i:0, h:0, w:0};
+            stats.characterStats[currentType][currentItem.j].h =
+                (stats.characterStats[currentType][currentItem.j].h || 0) + 1;
+            saveStats();
+            const hintText = currentCardMode === 'listen' ? currentItem.j : currentItem.r;
+            const toast = document.getElementById('feedback-toast');
+            toast.className = 'feedback-toast';
+            toast.style.cssText = 'background:var(--glass);color:var(--text-1);border-color:var(--border-strong);';
+            toast.textContent = `💡 ${hintText}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 1600);
+        }
+        // → Swipe Right: intentionally ignored — user must answer normally
+    }, {passive: true});
+}
+
+
 function setupMCQ() {
     document.getElementById('kana-mcq').textContent = currentItem.j;
     const optsDiv = document.getElementById('mcq-options');
@@ -508,11 +703,27 @@ function setupListen() {
 }
 
 function playAudio() {
-    if(!currentItem) return;
-    const msg = new SpeechSynthesisUtterance();
-    msg.text = currentItem.j;
+    if(!currentItem || !('speechSynthesis' in window)) return;
+    
+    // Ensure voices are loaded
+    if (!jaVoice) loadVoices();
+
+    window.speechSynthesis.cancel();
+    
+    const msg = new SpeechSynthesisUtterance(currentItem.j);
     msg.lang = 'ja-JP';
-    window.speechSynthesis.speak(msg);
+    if (jaVoice) msg.voice = jaVoice;
+    
+    msg.rate = 0.8; 
+    msg.pitch = 1.0;
+    msg.volume = 1.0;
+    
+    window.speechSynthesis.resume();
+    
+    // Small timeout to allow iOS to context-switch
+    setTimeout(() => {
+        window.speechSynthesis.speak(msg);
+    }, 50);
 }
 
 // Draw state
@@ -578,16 +789,26 @@ function handleAnswer(ans, btnEl=null, isDrawOverride=false) {
 
     if(!stats.characterStats[currentType]) stats.characterStats[currentType] = {};
     if(!stats.characterStats[currentType][currentItem.j]) {
-        stats.characterStats[currentType][currentItem.j] = {c:0, i:0, h:0};
+        stats.characterStats[currentType][currentItem.j] = {c:0, i:0, h:0, w:0};
     }
     
     if(isCorrect) {
+        haptic(50);
+        playSfx('correct');
         stats.streak++;
         stats.totalCorrect++;
         stats.characterStats[currentType][currentItem.j].c++;
+        // SRS: reduce errorScore on correct (min 0)
+        const cur = stats.characterStats[currentType][currentItem.j];
+        cur.w = Math.max(0, (cur.w || 0) - 1);
     } else {
+        haptic([50, 100, 50]);
+        playSfx('incorrect');
         stats.streak = 0;
         stats.characterStats[currentType][currentItem.j].i++;
+        // SRS: increase errorScore on incorrect
+        const cur = stats.characterStats[currentType][currentItem.j];
+        cur.w = (cur.w || 0) + 2;
         queue.push(currentItem);
         originalQueueSize++; 
     }
@@ -595,7 +816,7 @@ function handleAnswer(ans, btnEl=null, isDrawOverride=false) {
 
     const toast = document.getElementById('feedback-toast');
     toast.className = `feedback-toast ${isCorrect ? 'correct-toast' : 'incorrect-toast'}`;
-    toast.textContent = isCorrect ? 'CORRECT' : `INCORRECT - it was ${currentItem.r}`;
+    toast.textContent = isCorrect ? '✓ CORRECT' : `✗ INCORRECT — ${currentItem.r}`;
     toast.classList.remove('hidden');
 
     if(currentCardMode === 'mcq') {
