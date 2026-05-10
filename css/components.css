@@ -230,3 +230,162 @@
     background: #FF5252;
     box-shadow: 0 16px 32px rgba(var(--cta-red-rgb), 0.4);
 }
+
+/* Global Fixed Suite Hub */
+.global-suite-hub {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 6px 8px 6px 16px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.nix-text-logo {
+    font-weight: 800;
+    font-family: var(--font-display);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    padding-right: 4px;
+    transition: color 0.2s ease;
+}
+
+.nix-text-logo:hover {
+    color: var(--accent-primary);
+}
+
+.hub-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--glass-border);
+    margin: 0 4px;
+}
+
+/* Nix Suite Hub */
+.suite-hub-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-icon-btn:hover, .suite-hub-wrapper.active .nav-icon-btn {
+    background: var(--glass-bg-hover);
+    color: var(--accent-primary);
+}
+
+.suite-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    width: 280px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: top left;
+    z-index: 1000;
+}
+
+:root.light-theme .suite-dropdown {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.suite-hub-wrapper.active .suite-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.suite-header {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.suite-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.suite-app-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+
+.suite-app-card:hover {
+    background: var(--glass-bg-hover);
+}
+
+.suite-app-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.suite-app-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.suite-app-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.suite-app-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.suite-app-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}

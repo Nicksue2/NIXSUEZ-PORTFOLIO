@@ -11,6 +11,7 @@
     <meta name="theme-color" content="#050505">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="js/theme.js"></script>
+    <script src="js/cursor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <style>
@@ -198,7 +199,9 @@
         <button class="auth-header-btn" id="auth-open-btn">Sign In</button>
     </div>
 
-    <!-- Theme Toggle -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+    
     <button class="landing-theme-toggle" id="theme-btn" aria-label="Toggle Theme">
         <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
     </button>

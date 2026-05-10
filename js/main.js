@@ -136,6 +136,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+
+        // --- Nix Suite Hub Toggle ---
+        const suiteToggleBtn = document.getElementById('suite-toggle-btn');
+        const suiteHubWrapper = document.querySelector('.suite-hub-wrapper');
+        
+        if (suiteToggleBtn && suiteHubWrapper) {
+            suiteToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                suiteHubWrapper.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!suiteHubWrapper.contains(e.target)) {
+                    suiteHubWrapper.classList.remove('active');
+                }
+            });
+        }
     }
 
     // ============================================================
@@ -170,9 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const phrases = [
             'Hello World...',
             '<Hello, I\'m Nickolai!>',
-            'Software Engineer.',
+            'Information Technology.',
             'UI/UX Designer.',
-            'WebGL Enthusiast.'
+            'Aesthetic logic. Automated systems'
         ];
         let phraseIdx   = 0;
         let charIdx     = 0;

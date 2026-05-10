@@ -555,16 +555,19 @@
 
 /* Color-coded glow for each card */
 .bento-card[data-color="green"] .card-glow {
-    background: radial-gradient(circle at 0% 0%, rgba(var(--color-green), 0.12), transparent 55%);
+    background: radial-gradient(circle at top right, rgba(var(--color-green), 0.15) 0%, transparent 60%);
 }
 .bento-card[data-color="orange"] .card-glow {
-    background: radial-gradient(circle at 100% 0%, rgba(var(--color-orange), 0.1), transparent 55%);
+    background: radial-gradient(circle at top right, rgba(var(--color-orange), 0.12) 0%, transparent 60%);
 }
 .bento-card[data-color="purple"] .card-glow {
-    background: radial-gradient(circle at 100% 100%, rgba(var(--color-purple), 0.1), transparent 55%);
+    background: radial-gradient(circle at top right, rgba(var(--color-purple), 0.12) 0%, transparent 60%);
 }
 .bento-card[data-color="blue"] .card-glow {
-    background: radial-gradient(circle at 0% 100%, rgba(var(--color-blue), 0.1), transparent 55%);
+    background: radial-gradient(circle at top right, rgba(var(--color-blue), 0.12) 0%, transparent 60%);
+}
+.bento-card[data-color="red"] .card-glow {
+    background: radial-gradient(circle at top right, rgba(var(--cta-red-rgb), 0.12) 0%, transparent 60%);
 }
 
 .card-glow {
@@ -579,11 +582,15 @@
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
 }
+.bento-card:hover .card-glow {
+    opacity: 1;
+}
 
 .bento-card[data-color="green"]:hover  { border-color: rgba(var(--color-green), 0.35); }
 .bento-card[data-color="orange"]:hover { border-color: rgba(var(--color-orange), 0.3); }
 .bento-card[data-color="purple"]:hover { border-color: rgba(var(--color-purple), 0.3); }
 .bento-card[data-color="blue"]:hover   { border-color: rgba(var(--color-blue), 0.3); }
+.bento-card[data-color="red"]:hover    { border-color: rgba(var(--cta-red-rgb), 0.3); }
 
 .card-content {
     position: relative;
@@ -1147,7 +1154,7 @@ body, main, .hero-section, .hero-text-wrapper {
 
     /* === FOOTER / CONTACT === */
     .footer-section {
-        padding: 5rem 5% 3rem;
+        padding: 5rem 5% 7rem; /* Added extra bottom padding to clear the bottom floating nav */
     }
     .contact-form {
         margin-bottom: 3rem;
@@ -1163,13 +1170,14 @@ body, main, .hero-section, .hero-text-wrapper {
 
     /* === FLOATING NAV === */
     .floating-nav {
-        padding: 0.35rem 0.6rem;
-        gap: 0.1rem;
+        padding: 0.4rem 0.6rem;
+        gap: 0.15rem;
         left: 50%;
-        transform: translate(-50%, -120px); /* Keep the hidden state */
-        width: auto;
-        max-width: 92vw;
-        top: 1rem;
+        top: auto;
+        bottom: 1.5rem;
+        transform: translate(-50%, 150px); /* Keep the hidden state but sliding from bottom */
+        width: max-content;
+        max-width: 95vw;
     }
 
     .floating-nav.visible {
@@ -1179,6 +1187,7 @@ body, main, .hero-section, .hero-text-wrapper {
     .nav-link {
         padding: 0.3rem 0.45rem;
         font-size: 0.62rem;
+        white-space: nowrap;
     }
     .nav-divider {
         margin: 0 0.15rem;
