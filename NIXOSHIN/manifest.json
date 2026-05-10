@@ -1,0 +1,14 @@
+{
+  "name": "Nixoshin",
+  "short_name": "Nixoshin",
+  "description": "Premium minimalist photobooth — part of the Nix Suite.",
+  "start_url": "./dashboard.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "assets/nixoshin logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/nixoshin logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

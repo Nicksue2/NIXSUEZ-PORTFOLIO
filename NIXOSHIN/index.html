@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nixoshin — New Session</title>
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Nixoshin">
+    <link rel="icon" href="assets/nixoshin logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/nixoshin logo.png">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Dancing+Script:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Apply theme before paint to prevent flash -->
+    <script>
+        (function(){var t=localStorage.getItem('nixoshin_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+    <!-- FIX 1: Custom cursor elements — styled globally via style.css, animated by cursor.js -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Particle background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ─── GLOBAL HEADER ─── -->
+    <header class="global-header">
+        <a class="header-brand" href="dashboard.html">
+            <div class="brand-icon">
+                <img src="assets/nixoshin logo.png" alt="Nixoshin Logo">
+            </div>
+            <div>
+                <div class="brand-name">Nixoshin</div>
+                <div class="brand-suite">Nix Suite</div>
+            </div>
+        </a>
+        <div class="header-nav">
+            <button class="theme-toggle" aria-label="Toggle theme"></button>
+            <a href="dashboard.html" class="nav-pill cta">Dashboard</a>
+        </div>
+    </header>
+
+    <!-- ─── SETUP SCREEN ─── -->
+    <div class="setup-screen active" id="setupScreen">
+        <h1>NIXOSHIN</h1>
+
+        <p class="setup-label">1. Select a layout:</p>
+        <div class="layout-selector">
+            <div class="layout-card" data-layout="layout-a" data-shots="3">
+                <div class="preview-strip">
+                    <div class="preview-box"></div>
+                    <div class="preview-box"></div>
+                    <div class="preview-box"></div>
+                </div>
+                <strong>Layout A</strong> (3 Poses)
+            </div>
+            <div class="layout-card" data-layout="layout-b" data-shots="4">
+                <div class="preview-strip">
+                    <div class="preview-box"></div>
+                    <div class="preview-box"></div>
+                    <div class="preview-box"></div>
+                    <div class="preview-box"></div>
+                </div>
+                <strong>Layout B</strong> (4 Poses)
+            </div>
+        </div>
+
+        <p class="setup-label">2. Pick a frame color:</p>
+        <input type="color" id="frameColorPicker" value="#FFFFFF">
+
+        <p class="setup-label">3. Select a timer:</p>
+        <div class="timer-selector">
+            <button class="timer-button selected" data-timer="3">3s</button>
+            <button class="timer-button" data-timer="5">5s</button>
+            <button class="timer-button" data-timer="8">8s</button>
+        </div>
+
+        <button id="startAppButton" disabled>Start Photobooth</button>
+    </div>
+
+    <!-- ─── SESSION SCREEN ─── -->
+    <main class="container" id="photoboothApp">
+        <div class="photobooth-column" id="photobooth-live">
+            <div class="session-header" style="text-align: center; margin-bottom: 1.25rem;">
+                <h2 style="margin: 0; text-transform: uppercase; letter-spacing: -0.02em;">Live View</h2>
+            </div>
+            <div class="live-view" id="liveView">
+                <video id="video" autoplay playsinline></video>
+                <div id="countdown"></div>
+                <div id="flashEffect"></div>
+            </div>
+            <p id="poseInfoText"></p>
+            <div class="controls-main">
+                <button id="startButton">Start Session</button>
+                <button id="changeLayoutButton" class="secondary">Change Layout</button>
+            </div>
+        </div>
+
+        <!-- Hidden columns kept for script.js DOM compatibility -->
+        <div id="photobooth-result" style="display:none;">
+            <div id="photostripFrame"><canvas id="photoStrip"></canvas></div>
+        </div>
+        <div id="photobooth-controls" style="display:none;">
+            <input type="checkbox" id="showDateCheck" checked>
+            <input type="text" id="customTextInput">
+            <input type="text" id="filenameInput">
+            <a id="downloadButton"></a>
+            <div id="sticker-tray"></div>
+        </div>
+    </main>
+
+    <script src="nixoshin-utils.js"></script>
+    <script src="script.js"></script>
+    <script>
+        if (typeof gsap !== 'undefined') {
+            gsap.fromTo('#setupScreen', { opacity: 0, y: 24, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'power3.out' });
+        }
+    </script>
+    <script src="../nixodesu/js/cursor.js"></script>
+</body>
+</html>

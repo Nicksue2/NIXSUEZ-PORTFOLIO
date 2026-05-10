@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Your Strip — Nixoshin</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" href="assets/nixoshin logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/nixoshin logo.png">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Theme before render -->
+    <script>(function(){var t=localStorage.getItem('nixoshin_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <style>
+        /* ── TOKENS ── */
+        :root,[data-theme="dark"]{--bg:#000;--sur:rgba(16,16,16,.92);--bdr:rgba(255,255,255,.08);--bdr2:rgba(255,255,255,.22);--fg:#f5f5f5;--dim:rgba(255,255,255,.45);--ok:#34c759;--font:'Outfit',sans-serif;--fcursive:'Dancing Script',cursive;--r:16px;--grad-1:rgba(255,170,0,.12);--grad-2:rgba(232,0,58,.12)}
+        [data-theme="light"]{--bg:#f0f0f0;--sur:rgba(255,255,255,.92);--bdr:rgba(0,0,0,.15);--bdr2:rgba(0,0,0,.3);--fg:#111;--dim:rgba(0,0,0,.65);--grad-1:transparent;--grad-2:transparent}
+
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        html,body{height:100%;font-family:var(--font);background-color:var(--bg);background-image:radial-gradient(ellipse at 0% 0%, var(--grad-1) 0px, transparent 55%),radial-gradient(ellipse at 100% 100%, var(--grad-2) 0px, transparent 55%);background-attachment:fixed;color:var(--fg);transition:background-color .5s,color .4s}
+        body{display:flex;flex-direction:column;min-height:100dvh}
+        
+        /* ── CUSTOM CURSOR ── */
+        body { cursor: none; }
+        *, *::before, *::after { cursor: none !important; }
+        @media (hover: none) and (pointer: coarse) {
+            body, *, *::before, *::after { cursor: auto !important; }
+            #cursor-dot, #cursor-ring { display: none !important; }
+        }
+        #cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 6px; height: 6px;
+            background: #ffffff;
+            border-radius: 50%;
+            pointer-events: none; z-index: 999999;
+            transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+            will-change: transform;
+        }
+        [data-theme="light"] #cursor-dot { background: #000000; }
+        #cursor-ring {
+            position: fixed; top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none; z-index: 999998;
+            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+            will-change: transform;
+        }
+        [data-theme="light"] #cursor-ring { border-color: rgba(0, 0, 0, 0.4); }
+        #cursor-dot.hover { width: 10px; height: 10px; }
+        #cursor-ring.hover {
+            width: 56px; height: 56px;
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        [data-theme="light"] #cursor-ring.hover { border-color: rgba(0, 0, 0, 0.15); }
+        #cursor-dot.clicking { transform: scale(0.7); }
+        #cursor-ring.clicking { transform: scale(0.85); }
+
+        /* ── HEADER ── */
+        header{
+            position:sticky;top:0;z-index:200;
+            display:flex;align-items:center;justify-content:space-between;gap:8px;
+            padding:.75rem 5%;
+            border-bottom:1px solid var(--bdr);
+            backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+            background:rgba(0,0,0,.6);
+        }
+        [data-theme="light"] header{background:rgba(240,240,240,.8)}
+        .h-brand{font-size:.9rem;font-weight:700;color:var(--fg);text-decoration:none;display:flex;align-items:center;gap:7px}
+        .h-brand img { width: 24px; height: 24px; object-fit: contain; border-radius: 4px; }
+        .h-actions{display:flex;align-items:center;gap:8px}
+        .hbtn{font-family:var(--font);font-size:.8rem;font-weight:600;padding:6px 14px;border-radius:50px;border:1px solid var(--bdr);background:transparent;color:var(--dim);cursor:pointer;text-decoration:none;transition:all .2s ease}
+        .hbtn:hover{color:var(--fg);border-color:var(--bdr2);transform:translateY(-2px) scale(1.02);background:rgba(255,255,255,0.03)}
+        [data-theme="light"] .hbtn:hover{background:rgba(0,0,0,0.03)}
+        .hbtn.ok{background:var(--ok);color:#000;font-weight:700;border-color:transparent}
+        .hbtn.ok:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(52,199,89,.3)}
+        /* theme toggle */
+        .theme-toggle{width:32px;height:32px;border-radius:50%;border:1px solid var(--bdr);background:transparent;color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:border-color .2s,transform .2s;padding:0}
+        .theme-toggle:hover{border-color:var(--bdr2);transform:scale(1.08)}
+
+        /* ── MAIN LAYOUT ── */
+        main{flex:1;display:grid;grid-template-columns:1fr minmax(0,360px) 1fr;max-width:1100px;margin:0 auto;width:100%;padding:2rem 3%;align-items:start;gap:0}
+
+        /* Strip column */
+        .strip-col{padding:0 1.5rem;position:sticky;top:4.5rem;display:flex;flex-direction:column;align-items:center}
+        .col-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:.6rem}
+        .zoom-hint{font-size:.68rem;color:var(--dim);opacity:.6;margin-bottom:.75rem;display:flex;align-items:center;gap:4px}
+        .strip-wrapper{width:100%;max-height:calc(100dvh - 140px);display:flex;justify-content:center;overflow:hidden}
+        #resultCanvas{
+            max-width:100%;
+            max-height:calc(100dvh - 160px);
+            width:auto;height:auto;
+            border-radius:6px;display:block;
+            box-shadow:0 20px 50px rgba(0,0,0,.5);
+            cursor:zoom-in;
+            transition:transform .2s ease,box-shadow .2s ease;
+        }
+        #resultCanvas:hover{transform:scale(1.02);box-shadow:0 28px 65px rgba(0,0,0,.65)}
+
+        /* Customize column */
+        .cust-col{padding:0 1.5rem;display:flex;flex-direction:column;gap:1.1rem}
+        .cust-col h2{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)}
+        .panel{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:1.2rem;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+        .panel-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:.85rem}
+        #sticker-tray{display:flex;flex-wrap:wrap;gap:10px}
+        .sticker-img{width:44px;height:44px;cursor:pointer;border:2px solid transparent;border-radius:8px;transition:all .2s;object-fit:contain}
+        .sticker-img:hover{transform:scale(1.15)}
+        .sticker-img.selected{border-color:var(--fg);box-shadow:0 0 12px rgba(255,255,255,.18)}
+        .hint-text{font-size:.72rem;color:var(--dim);margin-top:.6rem}
+        .glass-input{width:100%;font-family:var(--font);font-size:.9rem;padding:9px 13px;background:rgba(255,255,255,.04);border:1.5px solid var(--bdr);border-radius:10px;color:var(--fg);transition:border-color .2s}
+        [data-theme="light"] .glass-input{background:rgba(0,0,0,.08)}
+        .glass-input::placeholder{color:var(--dim)}
+        .glass-input:focus{outline:none;border-color:var(--bdr2)}
+        .cursive{font-family:var(--fcursive);font-size:1rem}
+        .check-row{display:flex;align-items:center;gap:8px;margin-top:.7rem}
+        .check-row input{width:15px;height:15px;accent-color:var(--fg);cursor:pointer}
+        .check-row label{font-size:.85rem;color:var(--dim);cursor:pointer}
+        .file-row{display:flex;align-items:center;gap:6px}
+        .file-row input{text-align:right}
+        .file-row span{font-size:.85rem;color:var(--dim);flex-shrink:0}
+        .dl-btn{display:block;width:100%;padding:13px;background:var(--ok);color:#000;font-family:var(--font);font-size:.95rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;text-decoration:none;text-align:center;transition:all .25s ease;letter-spacing:.02em}
+        .dl-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(52,199,89,.3)}
+
+        /* No data */
+        .no-data{grid-column:1/-1;text-align:center;padding:6rem 2rem;color:var(--dim)}
+        .no-data h2{font-size:1.5rem;margin-bottom:1rem;color:var(--fg)}
+        .no-data p{margin-bottom:2rem}
+        .no-data a{display:inline-block;padding:13px 28px;border-radius:50px;background:var(--fg);color:var(--bg);font-family:var(--font);font-weight:700;text-decoration:none}
+
+        /* ── STRIP PREVIEW MODAL ── */
+        #preview-modal{
+            position:fixed;inset:0;z-index:9000;
+            background:rgba(0,0,0,.88);
+            backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+            display:flex;align-items:center;justify-content:center;padding:1.5rem;
+            opacity:0;pointer-events:none;transition:opacity .3s ease;
+            cursor:zoom-out;
+        }
+        #preview-modal.open{opacity:1;pointer-events:all}
+        #preview-modal img{
+            max-width:min(86vw,380px);
+            max-height:88dvh;
+            width:auto;height:auto;
+            border-radius:8px;
+            box-shadow:0 40px 80px rgba(0,0,0,.7);
+            transform:scale(.92);
+            transition:transform .35s cubic-bezier(.23,1,.32,1);
+            cursor:default;
+        }
+        #preview-modal.open img{transform:scale(1)}
+        .pm-close{
+            position:absolute;top:1rem;right:1rem;
+            width:38px;height:38px;border-radius:50%;
+            background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+            color:#fff;font-size:1.1rem;
+            display:flex;align-items:center;justify-content:center;
+            cursor:pointer;transition:background .2s;
+        }
+        .pm-close:hover{background:rgba(255,255,255,.2)}
+
+        /* ── RESPONSIVE (FIX 2) ── */
+        /* 
+         * The photo strip is PORTRAIT (510×1260 / 510×1635), ratio ≈ 1:2.5.
+         * Constraining by max-height was clipping heavily on mobile.
+         * Fix: constrain by max-width and let height be natural/auto.
+         * On landscape phone: side-by-side grid (strip left, controls right).
+         */
+        @media(max-width:900px){
+            main{
+                grid-template-columns:1fr;
+                padding:1.25rem 4%;
+                gap:1.25rem;
+            }
+            .strip-col{
+                position:static; /* un-sticky on mobile */
+                padding:0;
+                align-items:center;
+            }
+            .strip-wrapper{
+                max-height:none;   /* FIX: height was clipping portrait strip */
+                width:100%;
+                display:flex;
+                justify-content:center;
+            }
+            #resultCanvas{
+                /* Width-constrained: strip fills ~60% of screen width max */
+                max-width:min(280px,62vw);
+                max-height:none;   /* let aspect ratio flow naturally */
+                width:auto;
+                height:auto;
+            }
+            .cust-col{padding:0}
+            main>div:last-child{display:none} /* hide right spacer */
+        }
+        @media(max-width:480px){
+            main{padding:1rem 4%}
+            #resultCanvas{max-width:min(240px,66vw)}
+            .hbtn:not(.ok){display:none}
+        }
+        /* ── Landscape phone: side-by-side strip / controls (FIX 2b) ── */
+        @media(max-height:520px) and (orientation:landscape){
+            main{
+                /* Strip pinned left, controls scroll right */
+                grid-template-columns:auto 1fr;
+                padding:.75rem 1rem;
+                gap:1rem;
+                align-items:start;
+                overflow:hidden;
+            }
+            .strip-col{
+                position:sticky;
+                top:3.5rem;
+                padding:0;
+                max-width:150px;
+                align-items:flex-start;
+            }
+            .strip-wrapper{
+                max-height:calc(100dvh - 58px);
+                overflow:hidden;
+                display:flex;
+                align-items:flex-start;
+            }
+            #resultCanvas{
+                /* Height-constrained in landscape so it doesn't overflow */
+                max-width:150px;
+                max-height:calc(100dvh - 68px);
+                width:auto;
+                height:auto;
+            }
+            .cust-col{
+                overflow-y:auto;
+                max-height:calc(100dvh - 58px);
+                padding:0;
+                /* Thinner panels in landscape */
+                gap:.6rem;
+            }
+            .panel{padding:.8rem}
+            main>div:last-child{display:none}
+            .zoom-hint,.col-label{display:none} /* save vertical space */
+        }
+    </style>
+</head>
+<body>
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Strip Preview Modal -->
+    <div id="preview-modal">
+        <button class="pm-close" id="pm-close-btn" aria-label="Close">✕</button>
+        <img id="preview-img" alt="Full photo strip preview">
+    </div>
+
+    <header>
+        <a class="h-brand" href="dashboard.html">
+            <img src="assets/nixoshin logo.png" alt="Nixoshin Logo">
+            Nixoshin
+        </a>
+        <div class="h-actions">
+            <button class="theme-toggle" aria-label="Toggle theme"></button>
+            <a href="index.html" class="hbtn">New Session</a>
+            <a id="hdr-dl" class="hbtn ok" href="#" download>↓ Download</a>
+        </div>
+    </header>
+
+    <main id="main-content"></main>
+
+    <script src="nixoshin-utils.js"></script>
+    <script>
+        /* ── Layout definitions ── */
+        const LAYOUTS = {
+            'layout-a':{w:510,h:1260,footer:120,shots:[{x:15,y:15,W:480,H:360},{x:15,y:390,W:480,H:360},{x:15,y:765,W:480,H:360}]},
+            'layout-b':{w:510,h:1635,footer:120,shots:[{x:15,y:15,W:480,H:360},{x:15,y:390,W:480,H:360},{x:15,y:765,W:480,H:360},{x:15,y:1140,W:480,H:360}]}
+        };
+
+        const cleanUrl   = sessionStorage.getItem('picnix_cleanStrip');
+        const frameColor = sessionStorage.getItem('picnix_frameColor') || '#ffffff';
+        const layoutId   = sessionStorage.getItem('picnix_layoutId')   || 'layout-a';
+        const mainEl     = document.getElementById('main-content');
+
+        if (!cleanUrl) {
+            mainEl.innerHTML = `<div class="no-data"><h2>No photos yet!</h2><p>Start a session to capture your strip.</p><a href="index.html">Start New Session →</a></div>`;
+        } else {
+            buildUI();
+        }
+
+        function buildUI() {
+            mainEl.innerHTML = `
+                <div class="strip-col" id="strip-col">
+                    <p class="col-label">Your Strip</p>
+                    <p class="zoom-hint">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="14" y1="8" x2="8" y2="14"/></svg>
+                        Tap strip to zoom
+                    </p>
+                    <div class="strip-wrapper"><canvas id="resultCanvas"></canvas></div>
+                </div>
+                <div class="cust-col" id="cust-col">
+                    <h2>Customize</h2>
+                    <div class="panel">
+                        <p class="panel-title">Stickers</p>
+                        <div id="sticker-tray">
+                            <img src="stickerss/cat.png" alt="cat" class="sticker-img">
+                            <img src="stickerss/dog.jpg" alt="dog" class="sticker-img">
+                        </div>
+                        <p class="hint-text">Select a sticker → tap strip to place.</p>
+                    </div>
+                    <div class="panel">
+                        <p class="panel-title">Text</p>
+                        <input type="text" id="customText" class="glass-input cursive" placeholder="Cursive text..." maxlength="30">
+                        <div class="check-row">
+                            <input type="checkbox" id="showDate" checked>
+                            <label for="showDate">Show date on strip</label>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <p class="panel-title">File Name</p>
+                        <div class="file-row">
+                            <input type="text" id="fileInput" class="glass-input" value="nixoshin-${Date.now()}">
+                            <span>.png</span>
+                        </div>
+                    </div>
+                    <a id="dl-btn" class="dl-btn" href="#" download>Download Strip ↓</a>
+                </div>
+                <div></div>`;
+            initResult();
+        }
+
+        function initResult() {
+            const canvas = document.getElementById('resultCanvas');
+            const ctx    = canvas.getContext('2d');
+            const layout = LAYOUTS[layoutId];
+            canvas.width  = layout.w;
+            canvas.height = layout.h;
+
+            let cleanData  = null;
+            let stickers   = [];
+            let activeStic = null;
+
+            /* Load clean image */
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                cleanData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                redraw();
+                /* GSAP entrance */
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo('#strip-col',  {opacity:0,x:-20},{opacity:1,x:0,duration:.55,ease:'power3.out'});
+                    gsap.fromTo('#cust-col',   {opacity:0,x:20}, {opacity:1,x:0,duration:.55,delay:.12,ease:'power3.out'});
+                }
+            };
+            img.src = cleanUrl;
+
+            /* Redraw canvas */
+            function redraw() {
+                if (!cleanData) return;
+                ctx.putImageData(cleanData, 0, 0);
+                stickers.forEach(s => { try { ctx.drawImage(s.el, s.x, s.y, s.sz, s.sz); } catch(e){} });
+
+                const light = (frameColor === '#000000' || frameColor === '#000') ? '#fff' : '#000';
+                ctx.fillStyle = light;
+                ctx.textAlign = 'center';
+
+                const txt = document.getElementById('customText')?.value || '';
+                if (txt) {
+                    ctx.font = "700 20px 'Dancing Script'";
+                    ctx.fillText(txt, canvas.width/2, canvas.height - 85);
+                }
+                ctx.font = "bold 30px 'Poppins'";
+                ctx.fillText('Nixoshin', canvas.width/2, canvas.height - 45);
+
+                if (document.getElementById('showDate')?.checked) {
+                    const d = new Date();
+                    ctx.font = "20px 'Poppins'";
+                    ctx.fillText(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`, canvas.width/2, canvas.height-15);
+                }
+                syncDownload();
+            }
+
+            /* FIX 4: Sync download — exports ONLY the canvas pixel data.
+             * canvas.toDataURL() draws exactly what's on the <canvas> element:
+             * the photo strip at its native resolution (510×1260 / 510×1635)
+             * with NO surrounding UI, padding, or background bleed.
+             * The frame color is baked into the canvas pixels during takePhotos(),
+             * so the download is clean and self-contained. */
+            function syncDownload() {
+                const url   = canvas.toDataURL('image/png'); /* full-res canvas only */
+                const fname = (document.getElementById('fileInput')?.value.trim().replace(/\s+/g,'-') || 'nixoshin-strip') + '.png';
+                [document.getElementById('dl-btn'), document.getElementById('hdr-dl')].forEach(el => {
+                    if (el) { el.href = url; el.download = fname; }
+                });
+                document.getElementById('preview-img').src = url;
+                /* track downloads */
+                document.getElementById('dl-btn')?.addEventListener('click', () => {
+                    localStorage.setItem('nixoshin_downloads', parseInt(localStorage.getItem('nixoshin_downloads')||'0')+1);
+                }, {once:true});
+            }
+
+            /* ── Strip click: either ZOOM or STICKER PLACE ── */
+            canvas.addEventListener('click', e => {
+                if (activeStic) {
+                    /* Place sticker */
+                    const r  = canvas.getBoundingClientRect();
+                    const sx = canvas.width / r.width;
+                    const sy = canvas.height / r.height;
+                    const cy = e.offsetY * sy;
+                    if (cy > canvas.height - layout.footer) {
+                        showModal({title:'Oops!', message:'Place stickers above the text area.'});
+                        return;
+                    }
+                    stickers.push({el:activeStic, x:(e.offsetX*sx)-40, y:(e.offsetY*sy)-40, sz:80});
+                    redraw();
+                } else {
+                    /* Open zoom modal */
+                    openPreview();
+                }
+            });
+
+            /* ── Preview modal ── */
+            function openPreview() {
+                const modal = document.getElementById('preview-modal');
+                /* ensure image is synced */
+                document.getElementById('preview-img').src = canvas.toDataURL('image/png');
+                modal.classList.add('open');
+            }
+            document.getElementById('pm-close-btn').addEventListener('click', () => {
+                document.getElementById('preview-modal').classList.remove('open');
+            });
+            document.getElementById('preview-modal').addEventListener('click', e => {
+                if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') document.getElementById('preview-modal').classList.remove('open');
+            });
+
+            /* ── Sticker selection ── */
+            document.querySelectorAll('.sticker-img').forEach(s => s.addEventListener('click', () => {
+                if (activeStic === s) {
+                    activeStic = null;
+                    canvas.style.cursor = 'zoom-in';
+                    document.querySelectorAll('.sticker-img').forEach(x => x.classList.remove('selected'));
+                } else {
+                    document.querySelectorAll('.sticker-img').forEach(x => x.classList.remove('selected'));
+                    s.classList.add('selected');
+                    activeStic = s;
+                    canvas.style.cursor = 'copy';
+                }
+            }));
+
+            document.getElementById('customText')?.addEventListener('input', redraw);
+            document.getElementById('showDate')?.addEventListener('change', redraw);
+            document.getElementById('fileInput')?.addEventListener('input', syncDownload);
+        }
+    </script>
+    <script src="../nixodesu/js/cursor.js"></script>
+</body>
+</html>

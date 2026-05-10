@@ -10,14 +10,25 @@
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="js/theme.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
 </head>
 <body>
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
     <header class="db-header">
-        <a href="index.html" class="back-btn">← Back</a>
-        <h1 class="db-title">Dashboard</h1>
-        <button class="theme-toggle-btn" id="theme-toggle-btn">
-            <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        <button class="logo-btn" onclick="location.href='index.html'" aria-label="Nixodesu Home">
+            <img src="assets/nixodesu-logo.png" alt="Nixodesu" class="logo-icon" style="border-radius:9px; object-fit:cover;">
+            <span class="logo-text">Nixodesu</span>
         </button>
+        <nav class="header-nav">
+            <a href="practice.html" class="nav-link">Start Practice</a>
+            <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Theme">
+                <svg class="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+            </button>
+        </nav>
     </header>
 
     <main class="db-main">
@@ -94,14 +105,19 @@
         // Init theme
 
 
-        // Load Stats
-        let stats = JSON.parse(localStorage.getItem('nixodesu_stats')) || {
-            streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} }
-        };
-
+        let stats = null;
         let currentTab = 'hiragana';
 
+        function loadStats() {
+            stats = JSON.parse(localStorage.getItem('nixodesu_stats')) || {
+                streak: 0, totalCorrect: 0, characterStats: { hiragana: {}, katakana: {} }
+            };
+            renderDashboard();
+        }
+        window.loadStats = loadStats;
+
         function renderDashboard() {
+            if (!stats) return;
             let totalAnswers = 0;
             let totalAccCorrect = 0;
 
@@ -296,7 +312,7 @@
             location.reload();
         });
 
-        renderDashboard();
+        loadStats();
     </script>
 </body>
 </html>
