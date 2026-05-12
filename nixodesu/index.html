@@ -157,6 +157,7 @@
             width: 100%; padding: 14px 16px; border-radius: var(--radius-m);
             background: rgba(0,0,0,0.2); border: 1px solid var(--border);
             color: var(--text-1); font-size: 15px; font-family: inherit; transition: all 0.3s var(--ease);
+            box-sizing: border-box;
         }
         [data-theme="light"] .auth-input { background: rgba(255,255,255,0.5); }
         .auth-input:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.3); }
@@ -165,6 +166,7 @@
             background: var(--primary); color: #fff; font-size: 16px; font-weight: 700;
             cursor: pointer; margin-top: 10px; transition: all 0.3s var(--ease);
             box-shadow: 0 4px 15px var(--primary-glow);
+            box-sizing: border-box;
         }
         .auth-submit-btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px var(--primary-glow); }
         .auth-submit-btn:active { transform: translateY(0); }
@@ -179,6 +181,27 @@
             font-size: 24px; cursor: pointer; transition: color 0.3s;
         }
         .auth-close:hover { color: var(--text-1); }
+
+        /* Mobile Fixes */
+        @media (max-width: 600px) {
+            .auth-header-controls { right: auto; left: 24px; top: 24px; }
+            .landing-theme-toggle { right: 24px; top: 24px; }
+            .auth-modal { padding: 30px 20px; }
+            .landing-container { padding: 30px 20px; gap: 30px; }
+            .landing-actions { flex-direction: column; }
+        }
+
+        /* ─── FOOTER ─── */
+        .global-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; width: 100%; position: absolute; bottom: 0;
+            border-top: 1px solid var(--border);
+            background: transparent;
+        }
+        .developer-credit, .footer-portfolio-link { font-size: 0.85rem; opacity: 0.7; color: inherit; text-decoration: none; transition: opacity 0.2s; }
+        .developer-name { font-weight: 600; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+        [data-theme="light"] .developer-name { text-shadow: 0 0 10px rgba(0, 0, 0, 0.2); }
+        .footer-portfolio-link:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -249,6 +272,11 @@
             <div class="auth-toggle-text" id="auth-toggle-mode">Don't have an account? Sign up</div>
         </div>
     </div>
+
+    <footer class="global-footer">
+        <div class="developer-credit">Nixoshin · Part of the Nix Suite by heyitsnixsuez</div>
+        <a href="../index.html" class="footer-portfolio-link">← Back to Portfolio</a>
+    </footer>
 
     <script>
         // Loader Logic

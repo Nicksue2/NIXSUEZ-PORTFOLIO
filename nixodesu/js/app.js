@@ -290,7 +290,8 @@ function initApp() {
         toast.style.background = 'var(--glass)';
         toast.style.color = 'var(--text-1)';
         toast.style.borderColor = 'var(--border-strong)';
-        toast.textContent = `💡 Hint: ${currentCardMode === 'listen' ? currentItem.j : currentItem.r}`;
+        const hintText = (currentCardMode === 'listen' || currentCardMode === 'draw') ? currentItem.j : currentItem.r;
+        toast.textContent = `💡 Hint: ${hintText}`;
         toast.classList.remove('hidden');
         
         setTimeout(() => toast.classList.add('hidden'), 1500);
@@ -591,10 +592,16 @@ function nextCard() {
         el.classList.remove('correct', 'incorrect');
     });
 
-    if (currentCardMode === 'draw') {
-        document.getElementById('global-hint-btn')?.classList.add('hidden');
-    } else {
-        document.getElementById('global-hint-btn')?.classList.remove('hidden');
+    // Show hint button for all modes on PC
+    document.getElementById('global-hint-btn')?.classList.remove('hidden');
+
+    const hintEl = document.querySelector('.persistent-swipe-hint');
+    if (hintEl) {
+        if (currentCardMode === 'draw') {
+            hintEl.innerHTML = '👈 Swipe Left: Hint';
+        } else {
+            hintEl.innerHTML = '👈 Swipe Left: Hint &nbsp;|&nbsp; 👇 Swipe Down: Skip';
+        }
     }
 
     if (currentCardMode === 'mcq') setupMCQ();
@@ -624,7 +631,10 @@ function initSwipeGestures() {
         if (maxDelta < 60) return; // too small, ignore
 
         if (absDy > absDx && dy > 0) {
-            // ↓ Swipe Down = Skip (counts as a miss, moves to next card)
+            // ↓ Swipe Down = Skip
+            // Disable skip via swipe down in Draw mode to prevent accidental skips while drawing
+            if (currentCardMode === 'draw') return;
+            
             haptic([50, 80, 50]);
             playSfx('incorrect');
             if (!stats.characterStats[currentType]) stats.characterStats[currentType] = {};
@@ -651,7 +661,7 @@ function initSwipeGestures() {
             stats.characterStats[currentType][currentItem.j].h =
                 (stats.characterStats[currentType][currentItem.j].h || 0) + 1;
             saveStats(currentItem.j, currentType);
-            const hintText = currentCardMode === 'listen' ? currentItem.j : currentItem.r;
+            const hintText = (currentCardMode === 'listen' || currentCardMode === 'draw') ? currentItem.j : currentItem.r;
             const toast = document.getElementById('feedback-toast');
             toast.className = 'feedback-toast';
             toast.style.cssText = 'background:var(--glass);color:var(--text-1);border-color:var(--border-strong);';
@@ -703,7 +713,51 @@ function setupListen() {
     const all = [];
     Object.values(kanaData[currentType]).forEach(col => Object.values(col).forEach(arr => all.push(...arr)));
     
-    const opts = [currentItem.j];
+    // Visual distractors for commonly confused Kana
+    const visualDistractors = {
+        "あ": ["お", "め", "ぬ"], "い": ["り", "こ", "に"], "う": ["つ", "ろ", "る"], "え": ["ん", "そ", "て"], "お": ["あ", "む", "す"],
+        "か": ["や", "が", "わ"], "き": ["さ", "ち", "ぎ"], "く": ["へ", "ぐ", "て"], "け": ["は", "に", "げ"], "こ": ["い", "に", "ご"],
+        "さ": ["き", "ち", "ざ"], "し": ["も", "ん", "じ"], "す": ["む", "ず", "お"], "せ": ["や", "ぜ", "て"], "そ": ["ぞ", "ろ", "て"],
+        "た": ["な", "だ", "に"], "ち": ["ら", "さ", "ぢ"], "つ": ["う", "づ", "っ"], "て": ["で", "と", "そ"], "と": ["ど", "て", "こ"],
+        "な": ["た", "は", "ま"], "に": ["こ", "い", "た"], "ぬ": ["め", "ね", "あ"], "ね": ["れ", "わ", "ぬ"], "の": ["め", "あ", "る"],
+        "は": ["ほ", "ば", "ぱ"], "ひ": ["び", "ぴ", "い"], "ふ": ["ぶ", "ぷ", "う"], "へ": ["べ", "ぺ", "く"], "ほ": ["は", "ぼ", "ぽ"],
+        "ま": ["も", "は", "よ"], "み": ["む", "め", "ね"], "む": ["す", "お", "み"], "め": ["ぬ", "あ", "の"], "も": ["ま", "し", "は"],
+        "や": ["か", "ゆ", "よ"], "ゆ": ["や", "よ", "わ"], "よ": ["ま", "や", "ゆ"],
+        "ら": ["ち", "ろ", "る"], "り": ["い", "に", "け"], "る": ["ろ", "の", "わ"], "れ": ["ね", "わ", "み"], "ろ": ["る", "の", "そ"],
+        "わ": ["ね", "れ", "ろ"], "を": ["ち", "む", "ん"], "ん": ["え", "し", "そ"],
+        "ア": ["マ", "ヤ", "フ"], "イ": ["ト", "ナ", "ル"], "ウ": ["ワ", "フ", "ラ"], "エ": ["ユ", "コ", "ヨ"], "オ": ["ホ", "カ", "キ"],
+        "カ": ["オ", "ガ", "ク"], "キ": ["ギ", "チ", "サ"], "ク": ["ケ", "タ", "ワ"], "ケ": ["ク", "タ", "テ"], "コ": ["ユ", "ヨ", "エ"],
+        "サ": ["ザ", "ヤ", "チ"], "シ": ["ツ", "ソ", "ン"], "ス": ["ヌ", "ズ", "フ"], "セ": ["ゼ", "ヤ", "ヒ"], "ソ": ["ン", "ゾ", "ツ"],
+        "タ": ["ク", "ダ", "ケ"], "チ": ["テ", "ヂ", "ナ"], "ツ": ["シ", "ソ", "ン"], "テ": ["チ", "デ", "ラ"], "ト": ["ド", "イ", "ヒ"],
+        "ナ": ["メ", "チ", "マ"], "ニ": ["ミ", "エ", "コ"], "ヌ": ["ス", "ヲ", "フ"], "ネ": ["ヌ", "ホ", "マ"], "ノ": ["メ", "ソ", "ナ"],
+        "ハ": ["バ", "パ", "ル"], "ヒ": ["ビ", "ピ", "セ"], "フ": ["ブ", "プ", "ワ"], "ヘ": ["ベ", "ペ", "ク"], "ホ": ["ボ", "ポ", "オ"],
+        "マ": ["ア", "ヤ", "ム"], "ミ": ["ニ", "シ", "ツ"], "ム": ["マ", "メ", "ノ"], "メ": ["ノ", "ナ", "ヤ"], "モ": ["チ", "テ", "ト"],
+        "ヤ": ["マ", "ア", "セ"], "ユ": ["コ", "エ", "ヨ"], "ヨ": ["コ", "ユ", "エ"],
+        "ラ": ["フ", "ワ", "ウ"], "リ": ["ソ", "ン", "ル"], "ル": ["レ", "ハ", "ノ"], "レ": ["ル", "マ", "ム"], "ロ": ["コ", "ヨ", "ユ"],
+        "ワ": ["ウ", "フ", "ラ"], "ヲ": ["ヌ", "フ", "ワ"], "ン": ["ソ", "シ", "ツ"]
+    };
+    
+    let opts = [currentItem.j];
+    let similarities = visualDistractors[currentItem.j] || [];
+    
+    // Check if it's a dakuten/handakuten by finding base character if no direct match
+    if (similarities.length === 0) {
+        let base1 = String.fromCharCode(currentItem.j.charCodeAt(0) - 1);
+        let base2 = String.fromCharCode(currentItem.j.charCodeAt(0) - 2);
+        if (visualDistractors[base1]) similarities = [...visualDistractors[base1], base1];
+        else if (visualDistractors[base2]) similarities = [...visualDistractors[base2], base2];
+    }
+    
+    // Add visual distractors
+    for (let sim of similarities) {
+        // Ensure character exists in the current active mode (hiragana vs katakana) to avoid mixing them
+        const exists = all.find(item => item.j === sim);
+        if (exists && opts.length < 4 && !opts.includes(sim)) {
+            opts.push(sim);
+        }
+    }
+    
+    // Fill the rest with random characters
     while(opts.length < 4) {
         const j = all[Math.floor(Math.random()*all.length)].j;
         if(!opts.includes(j)) opts.push(j);
@@ -780,23 +834,103 @@ function initDrawing() {
         ctx.clearRect(0,0,cvs.width,cvs.height);
     });
     
-    document.getElementById('reveal-answer-btn')?.addEventListener('click', () => {
-        document.getElementById('draw-reveal').classList.remove('hidden');
-        document.getElementById('draw-reveal-kana').textContent = currentItem.j;
-        document.getElementById('reveal-answer-btn').classList.add('hidden');
-    });
+    document.getElementById('submit-draw-btn')?.addEventListener('click', async () => {
+        if (!isDrawing && !ctx) return;
+        const btn = document.getElementById('submit-draw-btn');
+        btn.textContent = 'Checking...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
 
-    document.getElementById('draw-correct-btn')?.addEventListener('click', () => handleAnswer(currentItem.r, null, true));
-    document.getElementById('draw-wrong-btn')?.addEventListener('click', () => handleAnswer('wrong', null, true));
+        const isValid = await validateDrawing(cvs, currentItem.j);
+
+        btn.textContent = 'Submit';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+
+        if (isValid) {
+            handleAnswer(currentItem.r, null, true);
+        } else {
+            handleAnswer('wrong', null, true);
+        }
+    });
+}
+
+function getBounds(imgData) {
+    let minX = imgData.width, maxX = 0, minY = imgData.height, maxY = 0;
+    let found = false;
+    for (let y = 0; y < imgData.height; y++) {
+        for (let x = 0; x < imgData.width; x++) {
+            const alpha = imgData.data[(y * imgData.width + x) * 4 + 3];
+            if (alpha > 20) { // low threshold for drawn pixels
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                found = true;
+            }
+        }
+    }
+    return found ? {minX, maxX, minY, maxY} : null;
+}
+
+async function validateDrawing(userCanvas, targetChar) {
+    const uCtx = userCanvas.getContext('2d');
+    const uData = uCtx.getImageData(0,0,userCanvas.width, userCanvas.height);
+    const bounds = getBounds(uData);
+    if (!bounds) return false;
+    
+    const bw = bounds.maxX - bounds.minX;
+    const bh = bounds.maxY - bounds.minY;
+    if (bw < 10 || bh < 10) return false; // too small scribble
+    
+    // Prepare a canvas for OCR (black text on white background)
+    const ocrCanvas = document.createElement('canvas');
+    const pad = 30; // generous padding for OCR
+    ocrCanvas.width = bw + pad * 2;
+    ocrCanvas.height = bh + pad * 2;
+    const oCtx = ocrCanvas.getContext('2d');
+    oCtx.fillStyle = 'white';
+    oCtx.fillRect(0, 0, ocrCanvas.width, ocrCanvas.height);
+    
+    // Transfer drawn pixels as black
+    const imgData = oCtx.getImageData(0,0,ocrCanvas.width, ocrCanvas.height);
+    for (let y = 0; y < bh; y++) {
+        for (let x = 0; x < bw; x++) {
+            const sx = bounds.minX + x;
+            const sy = bounds.minY + y;
+            const srcIdx = (sy * userCanvas.width + sx) * 4;
+            const alpha = uData.data[srcIdx + 3];
+            
+            if (alpha > 50) {
+                const dstIdx = ((y + pad) * ocrCanvas.width + (x + pad)) * 4;
+                imgData.data[dstIdx] = 0;     // R
+                imgData.data[dstIdx+1] = 0;   // G
+                imgData.data[dstIdx+2] = 0;   // B
+                imgData.data[dstIdx+3] = 255; // A
+            }
+        }
+    }
+    oCtx.putImageData(imgData, 0, 0);
+
+    // Run Tesseract
+    try {
+        if (typeof Tesseract === 'undefined') return false;
+        const result = await Tesseract.recognize(ocrCanvas, 'jpn');
+        const text = result.data.text.replace(/\s+/g, '');
+        console.log("OCR Match: ", text, " Target: ", targetChar);
+        return text.includes(targetChar);
+    } catch (e) {
+        console.error("OCR Error", e);
+        return false;
+    }
 }
 
 function setupDraw() {
     document.getElementById('draw-romaji-target').textContent = currentItem.r;
     const cvs = document.getElementById('draw-canvas');
     ctx.clearRect(0,0,cvs.width,cvs.height);
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-1').trim() || '#FFF';
-    document.getElementById('draw-reveal').classList.add('hidden');
-    document.getElementById('reveal-answer-btn').classList.remove('hidden');
+    ctx.strokeStyle = '#FFFFFF';
+    document.getElementById('submit-draw-btn').classList.remove('hidden');
 }
 
 // --- EVALUATION ---

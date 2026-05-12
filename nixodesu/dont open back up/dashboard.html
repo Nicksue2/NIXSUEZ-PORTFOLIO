@@ -57,6 +57,21 @@
                     <button class="list-tab-btn active" id="tab-hiragana">Hiragana</button>
                     <button class="list-tab-btn" id="tab-katakana">Katakana</button>
                 </div>
+                <div style="position: relative; margin: 16px 20px 0;">
+                    <div id="group-filter-container" style="display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-right: 32px; scroll-behavior: smooth;">
+                        <!-- Injected by JS -->
+                    </div>
+                    <div id="group-scroll-hint" style="position: absolute; right: -4px; top: 0; bottom: 8px; width: 48px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; display: flex; align-items: center; justify-content: flex-end; color: var(--text-3); transition: opacity 0.3s ease; opacity: 0;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; animation: bounceRight 1.5s infinite;"><path d="m9 18 6-6-6-6"/></svg>
+                    </div>
+                </div>
+                <style>
+                    #group-filter-container::-webkit-scrollbar { display: none; }
+                    @keyframes bounceRight {
+                        0%, 100% { transform: translateX(0); }
+                        50% { transform: translateX(4px); }
+                    }
+                </style>
                 <div class="kana-breakdown" id="kana-breakdown-container">
                     <!-- Injected by JS -->
                 </div>
@@ -101,6 +116,10 @@
     </div>
     </main>
 
+    <footer class="global-footer">
+        <div class="developer-credit">Nixoshin · Part of the Nix Suite by heyitsnixsuez</div>        <a href="../index.html" class="footer-portfolio-link">← Back to Portfolio</a>
+    </footer>
+
     <script>
         // Init theme
 
@@ -131,28 +150,137 @@
             document.getElementById('db-total').textContent = totalAnswers;
             document.getElementById('db-accuracy').textContent = totalAnswers === 0 ? '0%' : Math.round((totalAccCorrect/totalAnswers)*100) + '%';
 
+            renderGroupFilters();
             renderKanaList();
             renderWinRates();
         }
+
+        const KANA_GROUPS_HIRA = [
+            { id: 'a', label: 'あ', chars: ["あ","い","う","え","お"] },
+            { id: 'ka', label: 'か', chars: ["か","き","く","け","こ"] },
+            { id: 'sa', label: 'さ', chars: ["さ","し","す","せ","そ"] },
+            { id: 'ta', label: 'た', chars: ["た","ち","つ","て","と"] },
+            { id: 'na', label: 'な', chars: ["な","に","ぬ","ね","の"] },
+            { id: 'ha', label: 'は', chars: ["は","ひ","ふ","へ","ほ"] },
+            { id: 'ma', label: 'ま', chars: ["ま","み","む","め","も"] },
+            { id: 'ya', label: 'や', chars: ["や","ゆ","よ"] },
+            { id: 'ra', label: 'ら', chars: ["ら","り","る","れ","ろ"] },
+            { id: 'wa', label: 'わ', chars: ["わ","を","ん"] },
+            { id: 'ga', label: 'が', chars: ["が","ぎ","ぐ","げ","ご"] },
+            { id: 'za', label: 'ざ', chars: ["ざ","じ","ず","ぜ","ぞ"] },
+            { id: 'da', label: 'だ', chars: ["だ","ぢ","づ","で","ど"] },
+            { id: 'ba', label: 'ば', chars: ["ば","び","ぶ","べ","ぼ"] },
+            { id: 'pa', label: 'ぱ', chars: ["ぱ","ぴ","ぷ","ぺ","ぽ"] },
+            { id: 'combo', label: 'ゃ', chars: ["きゃ","きゅ","きょ","しゃ","しゅ","しょ","ちゃ","ちゅ","ちょ","にゃ","にゅ","にょ","ひゃ","ひゅ","ひょ","みゃ","みゅ","みょ","りゃ","りゅ","りょ","ぎゃ","ぎゅ","ぎょ","じゃ","じゅ","じょ","びゃ","びゅ","びょ","ぴゃ","ぴゅ","ぴょ"] }
+        ];
+
+        const KANA_GROUPS_KATA = [
+            { id: 'a', label: 'ア', chars: ["ア","イ","ウ","エ","オ"] },
+            { id: 'ka', label: 'カ', chars: ["カ","キ","ク","ケ","コ"] },
+            { id: 'sa', label: 'サ', chars: ["サ","シ","ス","セ","ソ"] },
+            { id: 'ta', label: 'タ', chars: ["タ","チ","ツ","テ","ト"] },
+            { id: 'na', label: 'ナ', chars: ["ナ","ニ","ヌ","ネ","ノ"] },
+            { id: 'ha', label: 'ハ', chars: ["ハ","ヒ","フ","ヘ","ホ"] },
+            { id: 'ma', label: 'マ', chars: ["マ","ミ","ム","メ","モ"] },
+            { id: 'ya', label: 'ヤ', chars: ["ヤ","ユ","ヨ"] },
+            { id: 'ra', label: 'ラ', chars: ["ラ","リ","ル","レ","ロ"] },
+            { id: 'wa', label: 'ワ', chars: ["ワ","ヲ","ン"] },
+            { id: 'ga', label: 'ガ', chars: ["ガ","ギ","グ","ゲ","ゴ"] },
+            { id: 'za', label: 'ザ', chars: ["ザ","ジ","ズ","ゼ","ゾ"] },
+            { id: 'da', label: 'ダ', chars: ["ダ","ヂ","ヅ","デ","ド"] },
+            { id: 'ba', label: 'バ', chars: ["バ","ビ","ブ","ベ","ボ"] },
+            { id: 'pa', label: 'パ', chars: ["パ","ピ","プ","ペ","ポ"] },
+            { id: 'combo', label: 'ャ', chars: ["キャ","キュ","キョ","シャ","シュ","ショ","チャ","チュ","チョ","ニャ","ニュ","ニョ","ヒャ","ヒュ","ヒョ","ミャ","ミュ","ミョ","リャ","リュ","リョ","ギャ","ギュ","ギョ","ジャ","ジュ","ジョ","ビャ","ビュ","ビョ","ピャ","ピュ","ピョ"] }
+        ];
+
+        let currentGroupFilter = 'a';
+
+        function renderGroupFilters() {
+            const container = document.getElementById('group-filter-container');
+            container.innerHTML = '';
+            
+            const groups = currentTab === 'hiragana' ? KANA_GROUPS_HIRA : KANA_GROUPS_KATA;
+            
+            if (!groups.find(g => g.id === currentGroupFilter)) {
+                currentGroupFilter = groups[0].id;
+            }
+
+            groups.forEach(g => {
+                const btn = document.createElement('button');
+                btn.textContent = g.label;
+                btn.style.padding = '6px 14px';
+                btn.style.border = 'none';
+                btn.style.borderRadius = 'var(--radius-m)';
+                btn.style.fontSize = '14px';
+                btn.style.fontWeight = '500';
+                btn.style.cursor = 'pointer';
+                btn.style.transition = 'all 0.2s ease';
+                btn.style.textTransform = 'capitalize';
+
+                if (g.id === currentGroupFilter) {
+                    btn.style.background = 'var(--text-1)';
+                    btn.style.color = 'var(--bg)';
+                } else {
+                    btn.style.background = 'var(--glass)';
+                    btn.style.color = 'var(--text-2)';
+                }
+
+                btn.addEventListener('click', () => {
+                    currentGroupFilter = g.id;
+                    renderGroupFilters();
+                    renderKanaList();
+                });
+                container.appendChild(btn);
+            });
+
+            // Initialize scroll hint logic
+            setTimeout(checkScrollHint, 50);
+        }
+
+        function checkScrollHint() {
+            const container = document.getElementById('group-filter-container');
+            const hint = document.getElementById('group-scroll-hint');
+            if (!container || !hint) return;
+            
+            // Check if container needs scrolling
+            if (container.scrollWidth > container.clientWidth + 2) {
+                // Check if user has scrolled to the end (allow 10px buffer)
+                if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 10) {
+                    hint.style.opacity = '0';
+                } else {
+                    hint.style.opacity = '1';
+                }
+            } else {
+                // Fits perfectly
+                hint.style.opacity = '0';
+            }
+        }
+
+        // Attach scroll listeners globally once
+        document.getElementById('group-filter-container')?.addEventListener('scroll', checkScrollHint);
+        window.addEventListener('resize', checkScrollHint);
 
         function renderKanaList() {
             const container = document.getElementById('kana-breakdown-container');
             container.innerHTML = '';
             
             const charStats = (stats.characterStats && stats.characterStats[currentTab]) || {};
-            const chars = Object.keys(charStats).sort((a, b) => {
-                const pA = charStats[a].c / (charStats[a].c + charStats[a].i);
-                const pB = charStats[b].c / (charStats[b].c + charStats[b].i);
-                return pA - pB; // sort weakest first
+            const groups = currentTab === 'hiragana' ? KANA_GROUPS_HIRA : KANA_GROUPS_KATA;
+            const activeGroup = groups.find(g => g.id === currentGroupFilter) || groups[0];
+            
+            // Only show chars for the active group that have progress
+            const charsWithProgress = activeGroup.chars.filter(char => {
+                const s = charStats[char];
+                return s && (s.c > 0 || s.i > 0);
             });
 
-            if (chars.length === 0) {
+            if (charsWithProgress.length === 0) {
                 container.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;text-align:center;">No data collected yet. Start practicing!</p>';
                 return;
             }
 
-            chars.forEach(char => {
-                const s = charStats[char];
+            charsWithProgress.forEach(char => {
+                const s = charStats[char] || {c: 0, i: 0, h: 0};
                 const total = s.c + s.i;
                 const pct = total === 0 ? 0 : Math.round((s.c / total) * 100);
                 
@@ -267,15 +395,19 @@
 
         document.getElementById('tab-hiragana').addEventListener('click', (e) => {
             currentTab = 'hiragana';
+            currentGroupFilter = 'a';
             document.getElementById('tab-hiragana').classList.add('active');
             document.getElementById('tab-katakana').classList.remove('active');
+            renderGroupFilters();
             renderKanaList();
         });
 
         document.getElementById('tab-katakana').addEventListener('click', (e) => {
             currentTab = 'katakana';
+            currentGroupFilter = 'a';
             document.getElementById('tab-katakana').classList.add('active');
             document.getElementById('tab-hiragana').classList.remove('active');
+            renderGroupFilters();
             renderKanaList();
         });
 
@@ -308,8 +440,12 @@
         });
 
         confirmBtn.addEventListener('click', () => {
-            localStorage.removeItem('nixodesu_stats');
-            location.reload();
+            if (typeof window.wipeAllData === 'function') {
+                window.wipeAllData();
+            } else {
+                localStorage.removeItem('nixodesu_stats');
+                location.reload();
+            }
         });
 
         loadStats();

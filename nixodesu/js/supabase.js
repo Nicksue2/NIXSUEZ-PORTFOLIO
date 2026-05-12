@@ -234,6 +234,19 @@ window.updateSupabaseKana = async function(type, char, charStats) {
     if (error) console.error('Error updating kana:', error);
 }
 
+window.wipeAllData = async function() {
+    localStorage.removeItem('nixodesu_stats');
+    if (currentUser) {
+        try {
+            await supabaseClient.from('kana_progress').delete().eq('user_id', currentUser.id);
+            await supabaseClient.from('user_stats').update({ current_streak: 0, total_answers: 0 }).eq('id', currentUser.id);
+        } catch (e) {
+            console.error('Error wiping remote data', e);
+        }
+    }
+    location.reload();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     if (window.supabase) checkAuth();
 });
