@@ -81,36 +81,7 @@
         <button id="startAppButton" disabled>Start Photobooth</button>
     </div>
 
-    <!-- ─── SESSION SCREEN ─── -->
-    <main class="container" id="photoboothApp">
-        <div class="photobooth-column" id="photobooth-live">
-            <div class="session-header" style="text-align: center; margin-bottom: 1.25rem;">
-                <h2 style="margin: 0; text-transform: uppercase; letter-spacing: -0.02em;">Live View</h2>
-            </div>
-            <div class="live-view" id="liveView">
-                <video id="video" autoplay playsinline></video>
-                <div id="countdown"></div>
-                <div id="flashEffect"></div>
-            </div>
-            <p id="poseInfoText"></p>
-            <div class="controls-main">
-                <button id="startButton">Start Session</button>
-                <button id="changeLayoutButton" class="secondary">Change Layout</button>
-            </div>
-        </div>
 
-        <!-- Hidden columns kept for script.js DOM compatibility -->
-        <div id="photobooth-result" style="display:none;">
-            <div id="photostripFrame"><canvas id="photoStrip"></canvas></div>
-        </div>
-        <div id="photobooth-controls" style="display:none;">
-            <input type="checkbox" id="showDateCheck" checked>
-            <input type="text" id="customTextInput">
-            <input type="text" id="filenameInput">
-            <a id="downloadButton"></a>
-            <div id="sticker-tray"></div>
-        </div>
-    </main>
 
     <footer class="global-footer">
         <span>Nixoshin · Part of the Nix Suite by heyitsnixsuez</span>
@@ -124,6 +95,5 @@
             gsap.fromTo('#setupScreen', { opacity: 0, y: 24, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'power3.out' });
         }
     </script>
-    <script src="../nixodesu/js/cursor.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nixodesu-v2.4.1";
+const CACHE_NAME = "nixodesu-v2.5";
 const ASSETS = [
   "/nixodesu/",
   "/nixodesu/index.html",

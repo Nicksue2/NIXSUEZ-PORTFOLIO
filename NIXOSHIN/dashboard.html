@@ -364,38 +364,9 @@
             .hero { padding: 3.5rem 5% 3rem; }
         }
 
-        /* ─── CUSTOM CURSOR (FIX 1) ─── */
-        /* Hide default cursor on pointer devices; touch devices keep auto */
-        @media (hover: hover) and (pointer: fine) {
-            body, *, *::before, *::after { cursor: none !important; }
-        }
-        @media (hover: none) and (pointer: coarse) {
-            #cursor-dot, #cursor-ring { display: none !important; }
-        }
-        #cursor-dot {
-            position:fixed;top:0;left:0;width:6px;height:6px;
-            background:#fff;border-radius:50%;pointer-events:none;
-            z-index:999999;will-change:transform;
-            transition:width .2s ease,height .2s ease,opacity .2s ease;
-        }
-        [data-theme="light"] #cursor-dot { background:#000; }
-        #cursor-ring {
-            position:fixed;top:0;left:0;width:36px;height:36px;
-            border:1.5px solid rgba(255,255,255,.4);border-radius:50%;
-            pointer-events:none;z-index:999998;will-change:transform;
-            transition:width .3s ease,height .3s ease,border-color .3s ease,opacity .3s ease;
-        }
-        [data-theme="light"] #cursor-ring { border-color:rgba(0,0,0,.4); }
-        #cursor-dot.hover  { width:10px;height:10px; }
-        #cursor-ring.hover { width:56px;height:56px;border-color:rgba(255,255,255,.15); }
-        [data-theme="light"] #cursor-ring.hover { border-color:rgba(0,0,0,.15); }
-        #cursor-dot.clicking  { transform:scale(0.7); }
-        #cursor-ring.clicking { transform:scale(0.85); }
     </style>
 </head>
 <body>
-    <div id="cursor-dot"></div>
-    <div id="cursor-ring"></div>
 
     <header class="global-header">
         <a class="header-brand" href="dashboard.html">
@@ -474,10 +445,7 @@
         </div>
     </section>
 
-    <footer>
-        <span>Nixoshin · Part of the Nix Suite by heyitsnixsuez</span>
-        <a href="../index.html" style="color: inherit; text-decoration: none; opacity: 0.5;">← Back to Portfolio</a>
-    </footer>
+    
 
     <script>
         // Load stats from localStorage
@@ -541,7 +509,11 @@
         });
     </script>
    
+    <footer class="global-footer">
+        <span>Nixoshin · Part of the Nix Suite by heyitsnixsuez</span>
+        <a href="../index.html" class="footer-portfolio-link">← Back to Portfolio</a>
+    </footer>
+
     <script src="nixoshin-utils.js"></script>
-    <script src="../nixodesu/js/cursor.js"></script>
 </body>
 </html>

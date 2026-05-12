@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nixoshin — Session</title>
+    <link rel="icon" href="assets/nixoshin logo.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Dancing+Script:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body class="white-background session-page">
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="global-header">
+        <a class="header-brand" href="dashboard.html">
+            <div class="brand-icon">
+                <img src="assets/nixoshin logo.png" alt="Nixoshin Logo">
+            </div>
+            <div>
+                <div class="brand-name">Nixoshin</div>
+                <div class="brand-suite">Nix Suite</div>
+            </div>
+        </a>
+        <div class="header-nav">
+            <button class="theme-toggle" aria-label="Toggle theme"></button>
+            <a href="dashboard.html" class="nav-pill cta">Dashboard</a>
+        </div>
+    </header>
+
+    <main class="session-container">
+        <div class="session-layout-wrapper">
+            <div class="camera-card">
+                <div class="live-view" id="liveView">
+                    <div class="live-badge">
+                        <span class="dot"></span>
+                        LIVE VIEW
+                    </div>
+                    <video id="video" autoplay playsinline></video>
+                    <div id="countdown"></div>
+                    <div id="flashEffect"></div>
+                </div>
+                <div class="session-info">
+                    <p id="poseInfoText">Initializing camera...</p>
+                </div>
+            </div>
+
+            <div class="controls-sidebar">
+                <button id="startButton" class="icon-btn main-action" data-tooltip="Capture Photos">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                </button>
+                <button id="changeLayoutButton" class="icon-btn secondary-action" data-tooltip="Back to Setup">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="photobooth-result" style="display:none;">
+        <div id="photostripFrame"><canvas id="photoStrip"></canvas></div>
+    </div>
+
+    <footer class="global-footer">
+        <span>Nixoshin · Part of the Nix Suite by heyitsnixsuez</span>
+        <a href="../index.html" class="footer-portfolio-link">← Back to Portfolio</a>
+    </footer>
+
+    <script src="nixoshin-utils.js"></script>
+    <script src="session.js"></script>
+</body>
+</html>
