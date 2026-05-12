@@ -360,6 +360,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (authOpenBtn) authOpenBtn.addEventListener('click', () => authModal.classList.remove('hidden'));
     if (authCloseBtn) authCloseBtn.addEventListener('click', () => authModal.classList.add('hidden'));
+
+    // Click outside to close
+    if (authModal) {
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.classList.add('hidden');
+            }
+        });
+    }
     
     if (toggleModeBtn) {
         toggleModeBtn.addEventListener('click', () => {

@@ -1,0 +1,55 @@
+/* =====================================================
+   NIXODESU – Global Variables & Theme System
+   Quiet Luxury / Apple iOS Aesthetic
+   ===================================================== */
+
+:root {
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --blur: 15px;
+
+    /* Transitions */
+    --t-fast: 0.2s var(--ease);
+    --t-base: 0.3s var(--ease);
+    --t-slow: 0.5s var(--ease);
+
+    /* Radius */
+    --radius-xl: 24px;
+    --radius-l: 18px;
+    --radius-m: 14px;
+    --radius-s: 10px;
+
+    /* Colors (Dark - Default) */
+    --bg:            #050505;
+    --header-bg:     linear-gradient(180deg, rgba(28, 28, 30, 0.9) 0%, rgba(15, 15, 15, 0.6) 100%);
+    --grad-1:        rgba(255, 170, 0, 0.12);
+    --grad-2:        rgba(232, 0, 58, 0.12);
+    --glass:         rgba(28, 28, 30, 0.65);
+    --glass-hover:   rgba(38, 38, 40, 0.8);
+    --border:        rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.22);
+    --text-1:        #FFFFFF;
+    --text-2:        rgba(235, 235, 245, 0.65);
+    --text-3:        rgba(235, 235, 245, 0.35);
+    --green:         #32D74B;
+    --red:           #FF3B3F;
+    --primary:       #FF5500; /* Solar Flare Accent */
+    --primary-glow:  rgba(255, 85, 0, 0.25);
+    --accent:        rgba(255,255,255,0.18);
+}
+
+[data-theme="light"] {
+    --bg:            #E8F5FF;
+    --header-bg:     linear-gradient(180deg, rgba(232, 245, 255, 0.97) 0%, rgba(200, 230, 255, 0.8) 100%);
+    --grad-1:        rgba(0, 80, 216, 0.18);
+    --grad-2:        rgba(232, 245, 255, 0.9);
+    --glass:         rgba(255, 255, 255, 0.72);
+    --glass-hover:   rgba(255, 255, 255, 0.92);
+    --border:        rgba(0, 80, 216, 0.12);
+    --border-strong: rgba(0, 80, 216, 0.28);
+    --text-1:        #0A1628;
+    --text-2:        rgba(10, 22, 40, 0.65);
+    --text-3:        rgba(10, 22, 40, 0.38);
+    --accent:        rgba(0, 80, 216, 0.07);
+    --primary:       #FF5500;
+    --primary-glow:  rgba(255, 85, 0, 0.22);
+}

@@ -6,49 +6,16 @@
     <title>Dashboard - Nixodesu</title>
     <link rel="icon" href="assets/nixodesu-logo.png">
     <link rel="apple-touch-icon" href="assets/nixodesu-logo.png">
+    <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/auth.css">
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="js/theme.js"></script>
     <script src="js/cursor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
-    <style>
-        .auth-indicator-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--radius-m, 8px); border: 1px solid var(--border, rgba(255,255,255,0.1)); background: var(--glass, rgba(255,255,255,0.05)); color: var(--text-2, #ccc); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; position: relative; font-family: inherit; }
-        .auth-indicator-btn:hover { background: var(--border, rgba(255,255,255,0.1)); color: var(--text-1, #fff); }
-        .auth-indicator-guest { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: var(--radius-m, 8px); background: var(--glass, rgba(255,255,255,0.05)); color: var(--text-3, #666); font-size: 13px; font-weight: 500; }
-        .auth-indicator-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px; background: var(--card-bg, #1a1f2e); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: var(--radius-m, 8px); padding: 12px; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        .auth-dropdown-email { font-size: 12px; color: var(--text-3, #666); margin-bottom: 10px; word-break: break-all; }
-        .auth-dropdown-logout { width: 100%; padding: 8px 12px; border: none; border-radius: var(--radius-s, 6px); background: var(--red, #ff3b3f); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
-        .auth-dropdown-logout:hover { opacity: 0.85; }
-        #auth-indicator { position: relative; }
-        @media (max-width: 640px) {
-            .auth-indicator-btn span { display: none; }
-            .auth-indicator-btn { padding: 6px; border-radius: 50%; width: 32px; height: 32px; justify-content: center; }
-            .auth-indicator-guest-btn span { display: none; }
-            .auth-indicator-guest-btn { padding: 6px; border-radius: 50%; width: 32px; height: 32px; justify-content: center; }
-            .auth-indicator-dropdown { right: -40px; }
-            .nav-link .nav-link-text { display: none; }
-        }
-        .nav-link { display: flex; align-items: center; gap: 6px; }
-        .nav-link svg { flex-shrink: 0; }
-        .auth-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 9000; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.3s ease; }
-        .auth-modal-overlay.hidden { opacity: 0; pointer-events: none; }
-        .auth-modal { background: var(--glass, rgba(255,255,255,0.05)); border: 1px solid var(--border-strong, rgba(255,255,255,0.15)); border-radius: var(--radius-xl, 16px); padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center; transform: translateY(0) scale(1); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .auth-modal-overlay.hidden .auth-modal { transform: translateY(20px) scale(0.95); }
-        .auth-modal h2 { font-size: 28px; font-weight: 700; margin-bottom: 24px; color: var(--text-1); }
-        .auth-input-group { margin-bottom: 16px; text-align: left; }
-        .auth-input-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; margin-left: 4px; }
-        .auth-input { width: 100%; padding: 14px 16px; border-radius: var(--radius-m, 8px); background: rgba(0,0,0,0.2); border: 1px solid var(--border, rgba(255,255,255,0.1)); color: var(--text-1); font-size: 15px; font-family: inherit; transition: all 0.3s ease; box-sizing: border-box; }
-        [data-theme="light"] .auth-input { background: rgba(255,255,255,0.5); }
-        .auth-input:focus { outline: none; border-color: var(--primary, #ff3b3f); }
-        .auth-submit-btn { width: 100%; padding: 16px; border-radius: var(--radius-m, 8px); border: none; background: var(--primary, #ff3b3f); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: all 0.3s ease; box-sizing: border-box; font-family: inherit; }
-        .auth-submit-btn:hover { opacity: 0.9; }
-        .auth-toggle-text { margin-top: 20px; font-size: 13px; color: var(--text-2); cursor: pointer; transition: color 0.3s ease; }
-        .auth-toggle-text:hover { color: var(--primary, #ff3b3f); text-decoration: underline; }
-        .auth-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-2); font-size: 24px; cursor: pointer; transition: color 0.3s; font-family: inherit; }
-        .auth-close:hover { color: var(--text-1); }
-    </style>
 </head>
 <body>
     <div id="cursor-dot"></div>
@@ -56,8 +23,8 @@
 
     <header class="db-header">
         <button class="logo-btn" onclick="location.href='index.html'" aria-label="Nixodesu Home">
-            <img src="assets/nixodesu-logo.png" alt="Nixodesu" class="logo-icon" style="border-radius:9px; object-fit:cover;">
-            <span class="logo-text">Nixodesu</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon" style="color: var(--primary);"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="logo-text">Home</span>
         </button>
         <nav class="header-nav">
             <div id="auth-indicator" style="display:none;"></div>
