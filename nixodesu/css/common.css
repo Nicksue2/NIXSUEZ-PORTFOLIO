@@ -1,0 +1,50 @@
+/* =====================================================
+   NIXODESU – Common Components
+   Shared Header, Nav, and Global UI Helpers
+   ===================================================== */
+
+/* --- Navigation Links --- */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-m);
+    background: var(--glass);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s var(--ease);
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background: var(--glass-hover);
+    color: var(--text-1);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+}
+
+.nav-link svg {
+    flex-shrink: 0;
+    transition: transform 0.3s var(--ease);
+}
+
+.nav-link:hover svg {
+    transform: scale(1.1);
+}
+
+/* --- Responsive Navigation --- */
+@media (max-width: 640px) {
+    .nav-link {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .nav-link .nav-link-text {
+        display: none;
+    }
+}

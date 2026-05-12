@@ -20,6 +20,11 @@ async function checkAuth() {
     currentUser = session?.user || null;
     updateAuthUI();
     
+    // Update auth indicator on dashboard/practice pages
+    if (typeof window.updateAuthIndicator === 'function') {
+        window.updateAuthIndicator();
+    }
+
     if (currentUser) {
         await syncDataFromSupabase();
     }
@@ -235,16 +240,104 @@ window.updateSupabaseKana = async function(type, char, charStats) {
 }
 
 window.wipeAllData = async function() {
-    localStorage.removeItem('nixodesu_stats');
-    if (currentUser) {
+    // Always wipe local data immediately
+    const blankStats = { characterStats: { hiragana: {}, katakana: {} }, streak: 0, totalCorrect: 0, totalAnswers: 0, accuracy: 0 };
+    localStorage.setItem('nixodesu_stats', JSON.stringify(blankStats));
+
+    // Get the LIVE session directly — don't rely on cached currentUser (race condition)
+    let userId = null;
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        userId = session?.user?.id || null;
+    } catch(e) {
+        console.warn('Could not get session:', e);
+    }
+
+    if (userId) {
+        const wipeBtn = document.getElementById('confirm-reset-btn');
+        if (wipeBtn) { wipeBtn.textContent = 'Wiping…'; wipeBtn.disabled = true; }
+
         try {
-            await supabaseClient.from('kana_progress').delete().eq('user_id', currentUser.id);
-            await supabaseClient.from('user_stats').update({ current_streak: 0, total_answers: 0 }).eq('id', currentUser.id);
+            // Zero out all kana progress (UPDATE is allowed by RLS, DELETE may not be)
+            const { error: zeroErr } = await supabaseClient
+                .from('kana_progress')
+                .update({ correct_count: 0, wrong_count: 0, hints_used: 0, error_weight: 0 })
+                .eq('user_id', userId);
+            if (zeroErr) console.warn('Zero kana_progress error:', zeroErr);
+
+            // Also try to delete rows entirely (may silently fail if no DELETE RLS policy)
+            await supabaseClient.from('kana_progress').delete().eq('user_id', userId);
+
+            // Reset user_stats
+            const { error: updErr } = await supabaseClient
+                .from('user_stats')
+                .update({ current_streak: 0, total_answers: 0, last_active_date: new Date().toISOString() })
+                .eq('id', userId);
+            if (updErr) throw updErr;
+
         } catch (e) {
-            console.error('Error wiping remote data', e);
+            console.error('Supabase wipe error:', e);
+            alert('Could not fully wipe remote data: ' + (e.message || JSON.stringify(e)));
+            if (wipeBtn) { wipeBtn.textContent = 'Wipe Data'; wipeBtn.disabled = false; }
+            // Still reload — local data is already cleared
         }
     }
+
     location.reload();
+}
+
+// --- AUTH INDICATOR (for dashboard/practice pages) ---
+window.updateAuthIndicator = function() {
+    const indicator = document.getElementById('auth-indicator');
+    if (!indicator) return;
+
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        const user = session?.user;
+        if (user) {
+            const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+            indicator.innerHTML = `
+                <button class="auth-indicator-btn" id="auth-indicator-toggle" aria-label="Account menu">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>${name}</span>
+                </button>
+                <div class="auth-indicator-dropdown hidden" id="auth-indicator-dropdown">
+                    <div class="auth-dropdown-email">${user.email}</div>
+                    <button class="auth-dropdown-logout" id="auth-dropdown-logout-btn">Sign Out</button>
+                </div>
+            `;
+            indicator.style.display = 'block';
+
+            const toggleBtn = document.getElementById('auth-indicator-toggle');
+            const dropdown = document.getElementById('auth-indicator-dropdown');
+            toggleBtn?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => dropdown?.classList.add('hidden'));
+            document.getElementById('auth-dropdown-logout-btn')?.addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                location.reload();
+            });
+        } else {
+            indicator.innerHTML = `
+                <button class="auth-indicator-btn auth-indicator-guest-btn" id="auth-indicator-guest-login" aria-label="Sign In">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Guest</span>
+                </button>
+            `;
+            indicator.style.display = 'block';
+
+            document.getElementById('auth-indicator-guest-login')?.addEventListener('click', () => {
+                const modal = document.getElementById('auth-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                } else {
+                    // Fallback: redirect to index for sign-in
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+    });
 }
 
 window.addEventListener('DOMContentLoaded', () => {

@@ -70,6 +70,32 @@ const kanaData = {
   }
 };
 
+// --- CONFUSION MATRIX: visually similar kana pairs ---
+const KANA_VISUAL_DISTRACTORS = {
+    // Hiragana look-alikes
+    "\u3042": ["\u304a", "\u3081", "\u306c"], "\u3044": ["\u308a", "\u3053", "\u306b"], "\u3046": ["\u3064", "\u308d", "\u308b"], "\u3048": ["\u3093", "\u305d", "\u3066"], "\u304a": ["\u3042", "\u3080", "\u3059"],
+    "\u304b": ["\u3084", "\u304c", "\u308f"], "\u304d": ["\u3055", "\u3061", "\u304e"], "\u304f": ["\u3078", "\u3050", "\u3066"], "\u3051": ["\u306f", "\u306b", "\u3052"], "\u3053": ["\u3044", "\u306b", "\u3054"],
+    "\u3055": ["\u304d", "\u3061", "\u3056"], "\u3057": ["\u3082", "\u3093", "\u3058"], "\u3059": ["\u3080", "\u305a", "\u304a"], "\u305b": ["\u3084", "\u305c", "\u3066"], "\u305d": ["\u305e", "\u308d", "\u3066"],
+    "\u305f": ["\u306a", "\u3060", "\u306b"], "\u3061": ["\u3089", "\u3055", "\u3062"], "\u3064": ["\u3046", "\u3065", "\u3063"], "\u3066": ["\u3067", "\u3068", "\u305d"], "\u3068": ["\u3069", "\u3066", "\u3053"],
+    "\u306a": ["\u305f", "\u306f", "\u307e"], "\u306b": ["\u3053", "\u3044", "\u305f"], "\u306c": ["\u3081", "\u306d", "\u3042"], "\u306d": ["\u308c", "\u308f", "\u306c"], "\u306e": ["\u3081", "\u3042", "\u308b"],
+    "\u306f": ["\u307b", "\u3070", "\u3071"], "\u3072": ["\u3073", "\u3074", "\u3044"], "\u3075": ["\u3076", "\u3077", "\u3046"], "\u3078": ["\u3079", "\u307a", "\u304f"], "\u307b": ["\u306f", "\u307c", "\u307d"],
+    "\u307e": ["\u3082", "\u306f", "\u3088"], "\u307f": ["\u3080", "\u3081", "\u306d"], "\u3080": ["\u3059", "\u304a", "\u307f"], "\u3081": ["\u306c", "\u3042", "\u306e"], "\u3082": ["\u307e", "\u3057", "\u306f"],
+    "\u3084": ["\u304b", "\u3086", "\u3088"], "\u3086": ["\u3084", "\u3088", "\u308f"], "\u3088": ["\u307e", "\u3084", "\u3086"],
+    "\u3089": ["\u3061", "\u308d", "\u308b"], "\u308a": ["\u3044", "\u306b", "\u3051"], "\u308b": ["\u308d", "\u306e", "\u308f"], "\u308c": ["\u306d", "\u308f", "\u307f"], "\u308d": ["\u308b", "\u306e", "\u305d"],
+    "\u308f": ["\u306d", "\u308c", "\u308d"], "\u3092": ["\u3061", "\u3080", "\u3093"], "\u3093": ["\u3048", "\u3057", "\u305d"],
+    // Katakana look-alikes (the notorious ones!)
+    "\u30a2": ["\u30de", "\u30e4", "\u30d5"], "\u30a4": ["\u30c8", "\u30ca", "\u30eb"], "\u30a6": ["\u30ef", "\u30d5", "\u30e9"], "\u30a8": ["\u30e6", "\u30b3", "\u30e8"], "\u30aa": ["\u30db", "\u30ab", "\u30ad"],
+    "\u30ab": ["\u30aa", "\u30ac", "\u30af"], "\u30ad": ["\u30ae", "\u30c1", "\u30b5"], "\u30af": ["\u30b1", "\u30bf", "\u30ef"], "\u30b1": ["\u30af", "\u30bf", "\u30c6"], "\u30b3": ["\u30e6", "\u30e8", "\u30a8"],
+    "\u30b5": ["\u30b6", "\u30e4", "\u30c1"], "\u30b7": ["\u30c4", "\u30bd", "\u30f3"], "\u30b9": ["\u30cc", "\u30ba", "\u30d5"], "\u30bb": ["\u30bc", "\u30e4", "\u30d2"], "\u30bd": ["\u30f3", "\u30be", "\u30c4"],
+    "\u30bf": ["\u30af", "\u30c0", "\u30b1"], "\u30c1": ["\u30c6", "\u30c2", "\u30ca"], "\u30c4": ["\u30b7", "\u30bd", "\u30f3"], "\u30c6": ["\u30c1", "\u30c7", "\u30e9"], "\u30c8": ["\u30c9", "\u30a4", "\u30d2"],
+    "\u30ca": ["\u30e1", "\u30c1", "\u30de"], "\u30cb": ["\u30df", "\u30a8", "\u30b3"], "\u30cc": ["\u30b9", "\u30f2", "\u30d5"], "\u30cd": ["\u30cc", "\u30db", "\u30de"], "\u30ce": ["\u30e1", "\u30bd", "\u30ca"],
+    "\u30cf": ["\u30d0", "\u30d1", "\u30eb"], "\u30d2": ["\u30d3", "\u30d4", "\u30bb"], "\u30d5": ["\u30d6", "\u30d7", "\u30ef"], "\u30d8": ["\u30d9", "\u30da", "\u30af"], "\u30db": ["\u30dc", "\u30dd", "\u30aa"],
+    "\u30de": ["\u30a2", "\u30e4", "\u30e0"], "\u30df": ["\u30cb", "\u30b7", "\u30c4"], "\u30e0": ["\u30de", "\u30e1", "\u30ce"], "\u30e1": ["\u30ce", "\u30ca", "\u30e4"], "\u30e2": ["\u30c1", "\u30c6", "\u30c8"],
+    "\u30e4": ["\u30de", "\u30a2", "\u30bb"], "\u30e6": ["\u30b3", "\u30a8", "\u30e8"], "\u30e8": ["\u30b3", "\u30e6", "\u30a8"],
+    "\u30e9": ["\u30d5", "\u30ef", "\u30a6"], "\u30ea": ["\u30bd", "\u30f3", "\u30eb"], "\u30eb": ["\u30ec", "\u30cf", "\u30ce"], "\u30ec": ["\u30eb", "\u30de", "\u30e0"], "\u30ed": ["\u30b3", "\u30e8", "\u30e6"],
+    "\u30ef": ["\u30a6", "\u30d5", "\u30e9"], "\u30f2": ["\u30cc", "\u30d5", "\u30ef"], "\u30f3": ["\u30bd", "\u30b7", "\u30c4"]
+};
+
 // --- STATE ---
 let currentType = 'hiragana';
 let selectedGroups = new Set(["あ a"]);
@@ -674,19 +700,61 @@ function initSwipeGestures() {
 }
 
 
+function getDistractors(item, type, count=3, format='r') {
+    const all = [];
+    let sameGroup = [];
+
+    // kanaData[type] = { Basic: { "あ a": [...], ... }, Dakuten: {...}, Combinations: {...} }
+    Object.values(kanaData[type]).forEach(categoryObj => {
+        Object.values(categoryObj).forEach(arr => {
+            if (arr.find(a => a.j === item.j)) sameGroup = arr;
+            all.push(...arr);
+        });
+    });
+
+    let opts = [];
+
+    // 1. Visual look-alike distractors
+    let similarities = KANA_VISUAL_DISTRACTORS[item.j] || [];
+    if (similarities.length === 0 && item.j.charCodeAt(0) > 12353) {
+        const base1 = String.fromCharCode(item.j.charCodeAt(0) - 1);
+        const base2 = String.fromCharCode(item.j.charCodeAt(0) - 2);
+        if (KANA_VISUAL_DISTRACTORS[base1]) similarities = [...KANA_VISUAL_DISTRACTORS[base1]];
+        else if (KANA_VISUAL_DISTRACTORS[base2]) similarities = [...KANA_VISUAL_DISTRACTORS[base2]];
+    }
+    similarities.forEach(sim => {
+        const found = all.find(a => a.j === sim);
+        if (found && !opts.includes(found[format]) && found[format] !== item[format]) {
+            opts.push(found[format]);
+        }
+    });
+
+    // 2. Same group characters (e.g. other vowels if answer is あ)
+    sameGroup.forEach(g => {
+        if (g.j !== item.j && !opts.includes(g[format])) {
+            opts.push(g[format]);
+        }
+    });
+
+    // 3. Random fallback
+    let safety = 0;
+    while (opts.length < count && safety++ < 200) {
+        const rand = all[Math.floor(Math.random() * all.length)];
+        if (rand.j !== item.j && !opts.includes(rand[format])) {
+            opts.push(rand[format]);
+        }
+    }
+
+    return opts.slice(0, count);
+}
+
 function setupMCQ() {
     document.getElementById('kana-mcq').textContent = currentItem.j;
     const optsDiv = document.getElementById('mcq-options');
     optsDiv.innerHTML = '';
     
-    const all = [];
-    Object.values(kanaData[currentType]).forEach(col => Object.values(col).forEach(arr => all.push(...arr)));
-    
-    const opts = [currentItem.r];
-    while(opts.length < 4) {
-        const r = all[Math.floor(Math.random()*all.length)].r;
-        if(!opts.includes(r)) opts.push(r);
-    }
+    const distractors = getDistractors(currentItem, currentType, 3, 'r');
+    const opts = [currentItem.r, ...distractors];
     opts.sort(()=>Math.random()-0.5);
     
     opts.forEach(o => {
@@ -710,58 +778,8 @@ function setupListen() {
     const optsDiv = document.getElementById('listen-options');
     optsDiv.innerHTML = '';
     
-    const all = [];
-    Object.values(kanaData[currentType]).forEach(col => Object.values(col).forEach(arr => all.push(...arr)));
-    
-    // Visual distractors for commonly confused Kana
-    const visualDistractors = {
-        "あ": ["お", "め", "ぬ"], "い": ["り", "こ", "に"], "う": ["つ", "ろ", "る"], "え": ["ん", "そ", "て"], "お": ["あ", "む", "す"],
-        "か": ["や", "が", "わ"], "き": ["さ", "ち", "ぎ"], "く": ["へ", "ぐ", "て"], "け": ["は", "に", "げ"], "こ": ["い", "に", "ご"],
-        "さ": ["き", "ち", "ざ"], "し": ["も", "ん", "じ"], "す": ["む", "ず", "お"], "せ": ["や", "ぜ", "て"], "そ": ["ぞ", "ろ", "て"],
-        "た": ["な", "だ", "に"], "ち": ["ら", "さ", "ぢ"], "つ": ["う", "づ", "っ"], "て": ["で", "と", "そ"], "と": ["ど", "て", "こ"],
-        "な": ["た", "は", "ま"], "に": ["こ", "い", "た"], "ぬ": ["め", "ね", "あ"], "ね": ["れ", "わ", "ぬ"], "の": ["め", "あ", "る"],
-        "は": ["ほ", "ば", "ぱ"], "ひ": ["び", "ぴ", "い"], "ふ": ["ぶ", "ぷ", "う"], "へ": ["べ", "ぺ", "く"], "ほ": ["は", "ぼ", "ぽ"],
-        "ま": ["も", "は", "よ"], "み": ["む", "め", "ね"], "む": ["す", "お", "み"], "め": ["ぬ", "あ", "の"], "も": ["ま", "し", "は"],
-        "や": ["か", "ゆ", "よ"], "ゆ": ["や", "よ", "わ"], "よ": ["ま", "や", "ゆ"],
-        "ら": ["ち", "ろ", "る"], "り": ["い", "に", "け"], "る": ["ろ", "の", "わ"], "れ": ["ね", "わ", "み"], "ろ": ["る", "の", "そ"],
-        "わ": ["ね", "れ", "ろ"], "を": ["ち", "む", "ん"], "ん": ["え", "し", "そ"],
-        "ア": ["マ", "ヤ", "フ"], "イ": ["ト", "ナ", "ル"], "ウ": ["ワ", "フ", "ラ"], "エ": ["ユ", "コ", "ヨ"], "オ": ["ホ", "カ", "キ"],
-        "カ": ["オ", "ガ", "ク"], "キ": ["ギ", "チ", "サ"], "ク": ["ケ", "タ", "ワ"], "ケ": ["ク", "タ", "テ"], "コ": ["ユ", "ヨ", "エ"],
-        "サ": ["ザ", "ヤ", "チ"], "シ": ["ツ", "ソ", "ン"], "ス": ["ヌ", "ズ", "フ"], "セ": ["ゼ", "ヤ", "ヒ"], "ソ": ["ン", "ゾ", "ツ"],
-        "タ": ["ク", "ダ", "ケ"], "チ": ["テ", "ヂ", "ナ"], "ツ": ["シ", "ソ", "ン"], "テ": ["チ", "デ", "ラ"], "ト": ["ド", "イ", "ヒ"],
-        "ナ": ["メ", "チ", "マ"], "ニ": ["ミ", "エ", "コ"], "ヌ": ["ス", "ヲ", "フ"], "ネ": ["ヌ", "ホ", "マ"], "ノ": ["メ", "ソ", "ナ"],
-        "ハ": ["バ", "パ", "ル"], "ヒ": ["ビ", "ピ", "セ"], "フ": ["ブ", "プ", "ワ"], "ヘ": ["ベ", "ペ", "ク"], "ホ": ["ボ", "ポ", "オ"],
-        "マ": ["ア", "ヤ", "ム"], "ミ": ["ニ", "シ", "ツ"], "ム": ["マ", "メ", "ノ"], "メ": ["ノ", "ナ", "ヤ"], "モ": ["チ", "テ", "ト"],
-        "ヤ": ["マ", "ア", "セ"], "ユ": ["コ", "エ", "ヨ"], "ヨ": ["コ", "ユ", "エ"],
-        "ラ": ["フ", "ワ", "ウ"], "リ": ["ソ", "ン", "ル"], "ル": ["レ", "ハ", "ノ"], "レ": ["ル", "マ", "ム"], "ロ": ["コ", "ヨ", "ユ"],
-        "ワ": ["ウ", "フ", "ラ"], "ヲ": ["ヌ", "フ", "ワ"], "ン": ["ソ", "シ", "ツ"]
-    };
-    
-    let opts = [currentItem.j];
-    let similarities = visualDistractors[currentItem.j] || [];
-    
-    // Check if it's a dakuten/handakuten by finding base character if no direct match
-    if (similarities.length === 0) {
-        let base1 = String.fromCharCode(currentItem.j.charCodeAt(0) - 1);
-        let base2 = String.fromCharCode(currentItem.j.charCodeAt(0) - 2);
-        if (visualDistractors[base1]) similarities = [...visualDistractors[base1], base1];
-        else if (visualDistractors[base2]) similarities = [...visualDistractors[base2], base2];
-    }
-    
-    // Add visual distractors
-    for (let sim of similarities) {
-        // Ensure character exists in the current active mode (hiragana vs katakana) to avoid mixing them
-        const exists = all.find(item => item.j === sim);
-        if (exists && opts.length < 4 && !opts.includes(sim)) {
-            opts.push(sim);
-        }
-    }
-    
-    // Fill the rest with random characters
-    while(opts.length < 4) {
-        const j = all[Math.floor(Math.random()*all.length)].j;
-        if(!opts.includes(j)) opts.push(j);
-    }
+    const distractors = getDistractors(currentItem, currentType, 3, 'j');
+    const opts = [currentItem.j, ...distractors];
     opts.sort(()=>Math.random()-0.5);
     
     opts.forEach(o => {
