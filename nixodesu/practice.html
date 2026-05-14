@@ -7,33 +7,33 @@
     <link rel="icon" href="assets/nixodesu-logo.png">
     <link rel="apple-touch-icon" href="assets/nixodesu-logo.png">
     <meta name="description" content="Master Hiragana and Katakana with beautiful flashcard quizzes.">
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="/nixodesu/css/variables.css">
+    <link rel="stylesheet" href="/nixodesu/css/style.css">
+    <link rel="stylesheet" href="/nixodesu/css/common.css">
+    <link rel="stylesheet" href="/nixodesu/css/auth.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="js/theme.js"></script>
-    <script src="js/cursor.js"></script>
+    <script src="/nixodesu/js/theme.js"></script>
+    <script src="/nixodesu/js/cursor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js"></script>
+    <script src="/nixodesu/js/supabase.js"></script>
 </head>
 <body>
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
 <div id="app">
   <header class="app-header">
-    <button class="logo-btn" onclick="location.href='index.html'" aria-label="Nixodesu Home">
-      <img src="assets/nixodesu-logo.png" alt="Logo" class="logo-icon" style="border-radius: 6px;">
+    <button class="logo-btn" onclick="location.href='/nixodesu/index.html'" aria-label="Nixodesu Home">
+      <img src="/nixodesu/assets/nixodesu-logo.png" alt="Logo" class="logo-icon" style="border-radius: 6px;">
       <span class="logo-text">Nixodesu</span>
     </button>
     <nav class="header-nav">
       <div id="auth-indicator" style="display:none;"></div>
-      <a href="dashboard.html" class="nav-link" aria-label="Dashboard">
+      <a href="/nixodesu/dashboard.html" class="nav-link" aria-label="Dashboard">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
           <span class="nav-link-text">Dashboard</span>
       </a>
@@ -223,7 +223,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="js/app.js"></script>
+<script src="/nixodesu/js/app.js"></script>
 
 <!-- Auth Modal (for Guest sign-in) -->
 <div class="auth-modal-overlay hidden" id="auth-modal">

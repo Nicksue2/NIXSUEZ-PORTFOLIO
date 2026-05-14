@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nixoshin-v1.5';
+const CACHE_NAME = 'nixoshin-v1.6';
 const APP_SHELL = [
     './',
     './dashboard.html',

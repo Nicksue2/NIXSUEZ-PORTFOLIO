@@ -6,18 +6,18 @@
     <title>Nixodesu - Premium Kana Learning</title>
     <link rel="icon" href="assets/nixodesu-logo.png">
     <link rel="apple-touch-icon" href="assets/nixodesu-logo.png">
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="/nixodesu/css/variables.css">
+    <link rel="stylesheet" href="/nixodesu/css/style.css">
+    <link rel="stylesheet" href="/nixodesu/css/common.css">
+    <link rel="stylesheet" href="/nixodesu/css/auth.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#050505">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="js/theme.js"></script>
-    <script src="js/cursor.js"></script>
+    <script src="/nixodesu/js/theme.js"></script>
+    <script src="/nixodesu/js/cursor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js"></script>
-    <link rel="stylesheet" href="css/landing.css">
+    <script src="/nixodesu/js/supabase.js"></script>
+    <link rel="stylesheet" href="/nixodesu/css/landing.css">
 </head>
 <body class="landing-page">
 
@@ -55,10 +55,10 @@
         </div>
 
         <div class="landing-actions">
-            <button class="btn-large btn-dash" onclick="location.href='dashboard.html'">
+            <button class="btn-large btn-dash" onclick="location.href='/nixodesu/dashboard.html'">
                 Dashboard
             </button>
-            <button class="btn-large btn-start" onclick="location.href='practice.html'">
+            <button class="btn-large btn-start" onclick="location.href='/nixodesu/practice.html'">
                 Start Practice →
             </button>
         </div>
@@ -106,7 +106,7 @@
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.register('/nixodesu/sw.js');
             });
         }
     </script>
