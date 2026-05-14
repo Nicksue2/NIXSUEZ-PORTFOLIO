@@ -333,7 +333,7 @@ window.updateAuthIndicator = function() {
                     modal.classList.remove('hidden');
                 } else {
                     // Fallback: redirect to index for sign-in
-                    window.location.href = 'index.html';
+                    window.location.href = '/nixodesu/index.html';
                 }
             });
         }

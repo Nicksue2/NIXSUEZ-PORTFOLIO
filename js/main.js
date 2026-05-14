@@ -16,9 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isLightMode) {
         document.documentElement.classList.add('light-theme');
         themeIcon.innerHTML = moonIcon;
-        if (profilePic) profilePic.src = 'assets/NA.png';
+        if (profilePic) profilePic.src = '/assets/NA.png';
     } else {
-        if (profilePic) profilePic.src = 'assets/NADARK.png';
+        if (profilePic) profilePic.src = '/assets/NADARK.png';
     }
 
     themeToggleBtn.addEventListener('click', () => {
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Swap profile picture
             if (profilePic) {
-                profilePic.src = isLight ? 'assets/NA.png' : 'assets/NADARK.png';
+                profilePic.src = isLight ? '/assets/NA.png' : '/assets/NADARK.png';
             }
             
             localStorage.setItem('theme', isLight ? 'light' : 'dark');

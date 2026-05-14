@@ -1,4 +1,4 @@
-const CACHE_NAME = "nixodesu-v2.8";
+const CACHE_NAME = "nixodesu-v2.9";
 const ASSETS = [
   "/nixodesu/",
   "/nixodesu/index.html",
@@ -6,8 +6,14 @@ const ASSETS = [
   "/nixodesu/dashboard.html",
   "/nixodesu/css/style.css",
   "/nixodesu/css/dashboard.css",
+  "/nixodesu/css/variables.css",
+  "/nixodesu/css/common.css",
+  "/nixodesu/css/auth.css",
+  "/nixodesu/css/landing.css",
   "/nixodesu/js/app.js",
   "/nixodesu/js/theme.js",
+  "/nixodesu/js/supabase.js",
+  "/nixodesu/js/cursor.js",
   "/nixodesu/manifest.json",
   "/nixodesu/assets/nixodesu-logo.png",
 ];

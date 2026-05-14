@@ -178,13 +178,13 @@ async function takePhotos() {
     localStorage.setItem('nixoshin_photos', photos);
 
     setTimeout(() => {
-        window.location.href = 'result.html';
+        window.location.href = '/NIXOSHIN/result.html';
     }, 1000);
 }
 
 startButton.addEventListener('click', takePhotos);
 changeLayoutButton.addEventListener('click', () => {
-    window.location.href = 'index.html';
+    window.location.href = '/NIXOSHIN/index.html';
 });
 
 setupWebcam();

@@ -1,15 +1,15 @@
-const CACHE_NAME = 'nixoshin-v1.6';
+const CACHE_NAME = 'nixoshin-v1.7';
 const APP_SHELL = [
-    './',
-    './dashboard.html',
-    './index.html',
-    './result.html',
-    './style.css',
-    './script.js',
-    './manifest.json',
-    './assets/nixoshin logo.png',
-    './stickerss/cat.png',
-    './stickerss/dog.jpg',
+    '/NIXOSHIN/',
+    '/NIXOSHIN/dashboard.html',
+    '/NIXOSHIN/index.html',
+    '/NIXOSHIN/result.html',
+    '/NIXOSHIN/style.css',
+    '/NIXOSHIN/script.js',
+    '/NIXOSHIN/manifest.json',
+    '/NIXOSHIN/assets/nixoshin logo.png',
+    '/NIXOSHIN/stickerss/cat.png',
+    '/NIXOSHIN/stickerss/dog.jpg',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Dancing+Script:wght@700&display=swap'
 ];
 

@@ -55,11 +55,11 @@ if (startAppButton) {
         y: -20,
         duration: 0.3,
         onComplete: () => {
-          window.location.href = "session.html";
+          window.location.href = "/NIXOSHIN/session.html";
         },
       });
     } else {
-      window.location.href = "session.html";
+      window.location.href = "/NIXOSHIN/session.html";
     }
   });
 }
