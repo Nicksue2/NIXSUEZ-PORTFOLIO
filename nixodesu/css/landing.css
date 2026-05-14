@@ -251,20 +251,29 @@ body.landing-page {
     display: none;
     align-items: center;
     gap: 8px;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* --- Mobile Fixes --- */
 @media (max-width: 640px) {
-    .landing-container { padding: 32px 24px; width: 90%; }
+    body.landing-page { overflow-y: auto; justify-content: flex-start; padding-top: 100px; padding-bottom: 40px; }
+    .landing-container { padding: 32px 24px; width: 92%; margin-top: 20px; }
     .landing-title { font-size: 36px; }
-    .landing-actions { flex-direction: column; }
+    .landing-subtitle { font-size: 16px; }
+    .landing-actions { flex-direction: column; gap: 12px; }
+    .hero-logo-box { width: 100px; height: 100px; border-radius: 24px; }
+    
     .landing-theme-toggle { top: 20px; right: 20px; width: 44px; height: 44px; }
-    .auth-header-controls { top: 20px; right: 80px; }
+    .auth-header-controls { top: 20px; right: 74px; gap: 8px; }
+    .auth-header-btn { padding: 10px 14px; font-size: 13px; }
+    .auth-user-display { padding: 8px 12px; font-size: 13px; max-width: 110px; }
 }
 
-@media (max-width: 600px) {
-    .auth-header-controls { right: auto; left: 24px; top: 24px; }
-    .landing-theme-toggle { right: 24px; top: 24px; }
-    .landing-container { padding: 30px 20px; gap: 30px; }
-    .landing-actions { flex-direction: column; }
+@media (max-width: 480px) {
+    .auth-header-controls { left: 20px; right: auto; }
+    .auth-user-display { max-width: 100px; }
+    .landing-container { gap: 24px; }
 }

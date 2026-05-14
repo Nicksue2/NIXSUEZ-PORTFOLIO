@@ -23,8 +23,8 @@
 
     <header class="db-header">
         <button class="logo-btn" onclick="location.href='index.html'" aria-label="Nixodesu Home">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon" style="color: var(--primary);"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span class="logo-text">Home</span>
+            <img src="assets/nixodesu-logo.png" alt="Logo" class="logo-icon" style="border-radius: 6px;">
+            <span class="logo-text">Nixodesu</span>
         </button>
         <nav class="header-nav">
             <div id="auth-indicator" style="display:none;"></div>
@@ -243,7 +243,7 @@
             // Initialize scroll hint logic
             setTimeout(checkScrollHint, 50);
         }
-
+w
         function checkScrollHint() {
             const container = document.getElementById('group-filter-container');
             const hint = document.getElementById('group-scroll-hint');
