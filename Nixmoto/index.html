@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta
+      name="description"
+      content="Fuel consumption tracker — Yamaha Mio Sporty"
+    />
+    <title>NixMoto</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icon512.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              mono: ["DM Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel='stylesheet' href='style.css' />
+  </head>
+  <body>
+    <!-- ── LOADER ── -->
+    <div id="loader">
+      <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em">
+        Nix<span style="color: var(--accent)">Moto</span>
+      </div>
+      <svg
+        class="spinner"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="rgba(45,212,191,0.7)"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.2" />
+        <path d="M12 2a10 10 0 0 1 10 10" />
+      </svg>
+    </div>
+
+    <!-- ── SIDEBAR OVERLAY ── -->
+    <div
+      class="sidebar-overlay"
+      id="sidebar-overlay"
+      onclick="closeSidebar()"
+    ></div>
+
+    <!-- ── APP SHELL ── -->
+    <div class="app-shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="mb-8">
+          <div
+            style="
+              font-size: 1.3rem;
+              font-weight: 700;
+              letter-spacing: -0.03em;
+              margin-bottom: 2px;
+            "
+          >
+            Nix<span style="color: var(--accent)">Moto</span>
+          </div>
+          <div
+            style="
+              font-size: 0.68rem;
+              color: rgba(255, 255, 255, 0.25);
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
+            "
+          >
+            Mio Sporty · Fuel Tracker
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-1 flex-1">
+          <button
+            class="nav-item active"
+            onclick="showPage('dashboard')"
+            id="nav-dashboard"
+          >
+            <svg
+              class="nav-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Dashboard
+          </button>
+          <button class="nav-item" onclick="showPage('add')" id="nav-add">
+            <svg
+              class="nav-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            Log Refuel
+          </button>
+          <button
+            class="nav-item"
+            onclick="showPage('history')"
+            id="nav-history"
+          >
+            <svg
+              class="nav-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            History
+          </button>
+          <button class="nav-item" onclick="showPage('stats')" id="nav-stats">
+            <svg
+              class="nav-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            Statistics
+          </button>
+          
+        
+          <button class="nav-item" onclick="showPage('oil')" id="nav-oil">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>
+            </svg>
+            Engine Oil
+          </button>
+        
+    </nav>
+
+        <div
+          class="mt-auto pt-4"
+          style="border-top: 1px solid rgba(255, 255, 255, 0.06)"
+        >
+          <div style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.15)">
+            v2.0 · Supabase sync
+          </div>
+          <div
+            id="sync-status-sidebar"
+            style="
+              font-size: 0.7rem;
+              color: rgba(255, 255, 255, 0.25);
+              margin-top: 2px;
+            "
+          >
+            ⬤ Not configured
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+        <!-- MOBILE HEADER -->
+        <div class="mobile-header desktop-only" style="display:none;">
+          <button
+            onclick="toggleSidebar()"
+            class="btn-ghost"
+            style="padding: 0.5rem"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div
+            style="font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em"
+          >
+            Nix<span style="color: var(--accent)">Moto</span>
+          </div>
+          <button
+            onclick="showPage('add')"
+            class="btn-ghost"
+            style="padding: 0.5rem"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          id="page-content"
+          style="padding: 1.5rem 1.25rem; max-width: 900px"
+        >
+          <!-- ══════════════════════════════════════════════════ -->
+          <!-- PAGE: DASHBOARD -->
+          <!-- ══════════════════════════════════════════════════ -->
+          <div class="page active fade-up" id="page-dashboard">
+            
+
+            <!-- KM/L Hero -->
+            <div class="accent-card rounded-3xl p-5 mb-4 fade-up">
+              <div
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  justify-content: space-between;
+                  margin-bottom: 0.5rem;
+                "
+              >
+                <span class="field-label" style="margin: 0"
+                  >Average Efficiency</span
+                >
+                <span
+                  id="dash-trip-badge"
+                  style="
+                    font-size: 0.65rem;
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    color: var(--accent);
+                    background: var(--accent-dim);
+                    border: 1px solid var(--accent-border);
+                    padding: 2px 8px;
+                    border-radius: 999px;
+                    display: none;
+                  "
+                ></span>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: flex-end;
+                  gap: 0.5rem;
+                  margin-bottom: 1.25rem;
+                "
+              >
+                <span
+                  id="dash-avg-kml"
+                  class="kml-value"
+                  style="color: var(--accent)"
+                  >--</span
+                >
+                <span
+                  style="
+                    font-size: 0.9rem;
+                    color: rgba(45, 212, 191, 0.5);
+                    padding-bottom: 0.35rem;
+                  "
+                  >km/L</span
+                >
+              </div>
+
+              <!-- Mini chart -->
+              <div
+                id="dash-chart"
+                class="chart-bar-wrap"
+                style="margin-bottom: 0.75rem"
+              ></div>
+              <div
+                style="
+                  font-size: 0.65rem;
+                  color: rgba(255, 255, 255, 0.2);
+                  text-align: right;
+                "
+              >
+                Last 10 fill-ups
+              </div>
+            </div>
+
+            <!-- Stat grid -->
+            <div class="stat-grid mb-4">
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Total Spent</span>
+                <div
+                  id="dash-total-spent"
+                  style="
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    margin-top: 2px;
+                  "
+                >
+                  ₱ --
+                </div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Total Liters</span>
+                <div
+                  id="dash-total-liters"
+                  style="
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    margin-top: 2px;
+                  "
+                >
+                  -- L
+                </div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Total Distance</span>
+                <div
+                  id="dash-total-km"
+                  style="
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    margin-top: 2px;
+                  "
+                >
+                  -- km
+                </div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Cost / km</span>
+                <div
+                  id="dash-cost-km"
+                  style="
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    margin-top: 2px;
+                  "
+                >
+                  ₱ --
+                </div>
+              </div>
+            </div>
+
+            <!-- Last log -->
+            <div
+              class="glass rounded-2xl p-4 mb-4"
+              id="last-log-card"
+              style="display: none"
+            >
+              <span class="field-label">Last Fill-up</span>
+              <div id="last-log-content" style="margin-top: 0.5rem"></div>
+            </div>
+
+            <!-- Quick add CTA -->
+            <button class="btn-primary" onclick="showPage('add')">
+              + Log New Refuel
+            </button>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════ -->
+          <!-- PAGE: ADD LOG -->
+          <!-- ══════════════════════════════════════════════════ -->
+          <div class="page fade-up" id="page-add">
+            <h2
+              style="
+                font-size: 1.2rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-bottom: 1.25rem;
+              "
+            >
+              Log Refuel
+            </h2>
+
+            <div class="glass rounded-3xl p-5 mb-4">
+              <div style="display: grid; gap: 1rem">
+                <!-- Odometer -->
+                <div>
+                  <label class="field-label" for="inp-odo"
+                    >Odometer Reading (km)</label
+                  >
+                  <input
+                    id="inp-odo"
+                    type="number"
+                    inputmode="decimal"
+                    placeholder="e.g. 12,450"
+                    class="input-field"
+                  />
+                </div>
+
+                <!-- Paid + Price row -->
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0.75rem;
+                  "
+                >
+                  <div>
+                    <label class="field-label" for="inp-paid"
+                      >Total Paid (₱)</label
+                    >
+                    <input
+                      id="inp-paid"
+                      type="number"
+                      inputmode="decimal"
+                      placeholder="e.g. 200"
+                      class="input-field"
+                      oninput="calcPreview()"
+                    />
+                  </div>
+                  <div>
+                    <label class="field-label" for="inp-price"
+                      >Price / Liter (₱)</label
+                    >
+                    <input
+                      id="inp-price"
+                      type="number"
+                      inputmode="decimal"
+                      placeholder="e.g. 65.50"
+                      class="input-field"
+                      oninput="calcPreview()"
+                    />
+                  </div>
+                </div>
+
+                <!-- Date + Time row -->
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0.75rem;
+                  "
+                >
+                  <div>
+                    <label class="field-label" for="inp-date">Date</label>
+                    <input id="inp-date" type="date" class="input-field" />
+                  </div>
+                  <div>
+                    <label class="field-label" for="inp-time">Time</label>
+                    <input id="inp-time" type="time" class="input-field" />
+                  </div>
+                </div>
+
+                <!-- Note -->
+                <div>
+                  <label class="field-label" for="inp-note"
+                    >Note <span style="opacity: 0.5">(optional)</span></label
+                  >
+                  <input
+                    id="inp-note"
+                    type="text"
+                    placeholder="e.g. Shell EDSA, modified air filter"
+                    class="input-field"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview -->
+            <div
+              id="preview-card"
+              class="rounded-2xl p-4 mb-4"
+              style="
+                display: none;
+                background: rgba(45, 212, 191, 0.06);
+                border: 1px solid rgba(45, 212, 191, 0.18);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 0.5rem;
+                "
+              >
+                <span class="field-label" style="margin: 0">Calculated</span>
+              </div>
+              <div style="display: flex; gap: 1.5rem; flex-wrap: wrap">
+                <div>
+                  <div
+                    style="
+                      font-size: 0.65rem;
+                      color: rgba(255, 255, 255, 0.3);
+                      text-transform: uppercase;
+                      letter-spacing: 0.07em;
+                    "
+                  >
+                    Liters Added
+                  </div>
+                  <div
+                    id="prev-liters"
+                    style="
+                      font-family: &quot;DM Mono&quot;, monospace;
+                      font-size: 1rem;
+                      font-weight: 500;
+                      color: var(--accent);
+                    "
+                  ></div>
+                </div>
+                <div id="prev-kml-wrap" style="display: none">
+                  <div
+                    style="
+                      font-size: 0.65rem;
+                      color: rgba(255, 255, 255, 0.3);
+                      text-transform: uppercase;
+                      letter-spacing: 0.07em;
+                    "
+                  >
+                    Trip Efficiency
+                  </div>
+                  <div
+                    id="prev-kml"
+                    style="
+                      font-family: &quot;DM Mono&quot;, monospace;
+                      font-size: 1rem;
+                      font-weight: 600;
+                      color: var(--accent);
+                    "
+                  ></div>
+                </div>
+                <div id="prev-tripkm-wrap" style="display: none">
+                  <div
+                    style="
+                      font-size: 0.65rem;
+                      color: rgba(255, 255, 255, 0.3);
+                      text-transform: uppercase;
+                      letter-spacing: 0.07em;
+                    "
+                  >
+                    Trip Distance
+                  </div>
+                  <div
+                    id="prev-tripkm"
+                    style="
+                      font-family: &quot;DM Mono&quot;, monospace;
+                      font-size: 1rem;
+                      color: var(--accent);
+                    "
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-primary" id="save-btn" onclick="saveLog()">
+              Save Fuel Log
+            </button>
+            <div
+              id="save-error"
+              style="
+                color: var(--danger);
+                font-size: 0.78rem;
+                margin-top: 0.625rem;
+                display: none;
+              "
+            ></div>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════ -->
+          <!-- PAGE: HISTORY -->
+          <!-- ══════════════════════════════════════════════════ -->
+          <div class="page" id="page-history">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1.25rem;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+              "
+            >
+              <h2
+                style="
+                  font-size: 1.2rem;
+                  font-weight: 700;
+                  letter-spacing: -0.02em;
+                "
+              >
+                History
+              </h2>
+              <div style="display: flex; gap: 0.5rem">
+                <button
+                  class="btn-ghost"
+                  onclick="exportCSV()"
+                  style="
+                    font-size: 0.75rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                  "
+                >
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Export CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- Desktop table header -->
+            <div
+              class="glass rounded-t-2xl desktop-only"
+              style="padding: 0.75rem 1.25rem"
+            >
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 120px 1fr 80px 90px 90px 80px auto;
+                  gap: 1rem;
+                  font-size: 0.65rem;
+                  font-weight: 600;
+                  letter-spacing: 0.07em;
+                  text-transform: uppercase;
+                  color: rgba(255, 255, 255, 0.3);
+                "
+              >
+                <span>Date & Time</span>
+                <span>Odometer</span>
+                <span>Trip km</span>
+                <span>Paid (₱)</span>
+                <span>Liters</span>
+                <span>km/L</span>
+                <span></span>
+              </div>
+            </div>
+
+            <div
+              id="history-list"
+              class="glass rounded-2xl desktop-only"
+              style="
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                border-top: none;
+              "
+            ></div>
+            <div
+              id="history-list-mobile"
+              class="mobile-only"
+              style="display: flex; flex-direction: column; gap: 0.5rem"
+            ></div>
+            <div
+              id="history-empty"
+              style="
+                display: none;
+                padding: 3rem 1.5rem;
+                text-align: center;
+                color: rgba(255, 255, 255, 0.25);
+                font-size: 0.875rem;
+              "
+            >
+              No logs yet. Add your first refuel!
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════ -->
+          <!-- PAGE: STATISTICS -->
+          <!-- ══════════════════════════════════════════════════ -->
+          <div class="page" id="page-stats">
+            <h2
+              style="
+                font-size: 1.2rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-bottom: 1.25rem;
+              "
+            >
+              Statistics
+            </h2>
+
+            <div class="glass rounded-3xl p-5 mb-4">
+              <span class="field-label">Efficiency Over Time</span>
+              <div
+                id="stats-chart"
+                class="chart-bar-wrap"
+                style="height: 120px; margin-top: 1rem"
+              ></div>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+              "
+            >
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Best Trip</span>
+                <div
+                  id="stat-best"
+                  style="
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: var(--good);
+                  "
+                >
+                  --
+                </div>
+                <div
+                  id="stat-best-date"
+                  style="
+                    font-size: 0.7rem;
+                    color: rgba(255, 255, 255, 0.25);
+                    margin-top: 2px;
+                  "
+                ></div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Worst Trip</span>
+                <div
+                  id="stat-worst"
+                  style="
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: var(--danger);
+                  "
+                >
+                  --
+                </div>
+                <div
+                  id="stat-worst-date"
+                  style="
+                    font-size: 0.7rem;
+                    color: rgba(255, 255, 255, 0.25);
+                    margin-top: 2px;
+                  "
+                ></div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Avg Spend / Fill</span>
+                <div
+                  id="stat-avg-spend"
+                  style="
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                  "
+                >
+                  --
+                </div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <span class="field-label">Total Logs</span>
+                <div
+                  id="stat-count"
+                  style="
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                  "
+                >
+                  0
+                </div>
+              </div>
+            </div>
+
+            <!-- Monthly breakdown -->
+            <div class="glass rounded-2xl p-4">
+              <span class="field-label" style="margin-bottom: 0.75rem"
+                >Monthly Breakdown</span
+              >
+              <div
+                id="monthly-breakdown"
+                style="
+                  margin-top: 0.75rem;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 0.5rem;
+                "
+              ></div>
+              <div
+                id="monthly-empty"
+                style="
+                  color: rgba(255, 255, 255, 0.25);
+                  font-size: 0.8rem;
+                  padding: 1rem 0;
+                  text-align: center;
+                "
+              >
+                No data yet.
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════ -->
+          
+          <!-- PAGE: OIL -->
+          <div class="page" id="page-oil">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem;">
+              Engine Oil Tracker
+            </h2>
+
+            <div class="glass" style="padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;">
+                  Next Change Due
+                </div>
+              </div>
+              <div style="font-family: 'DM Mono', monospace; font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em;" id="oil-remaining-km">
+                -- km
+              </div>
+              
+              <div style="margin-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 0.5rem;">
+                  <span>Since last change: <span id="oil-since-km" style="color: #fff">-- km</span></span>
+                  <span>Interval: 900 km</span>
+                </div>
+                <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                  <div id="oil-progress-bar" style="height: 100%; width: 0%; background: var(--accent); border-radius: 3px; transition: width 0.3s ease, background 0.3s ease;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass" style="padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem;">Log Oil Change</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                  <label class="field-label">Odometer (km)</label>
+                  <input type="number" id="oil-odo" class="input-field" placeholder="0" />
+                </div>
+                <div>
+                  <label class="field-label">Date</label>
+                  <input type="date" id="oil-date" class="input-field" />
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                  <label class="field-label">Brand / Viscosity</label>
+                  <input type="text" id="oil-brand" class="input-field" placeholder="e.g. Yamalube 10W-40" />
+                </div>
+                <div>
+                  <label class="field-label">Cost (₱)</label>
+                  <input type="number" id="oil-cost" class="input-field" placeholder="0.00" />
+                </div>
+              </div>
+              <button class="btn-primary w-full" id="oil-save-btn" onclick="saveOilLog()">Save Oil Change</button>
+            </div>
+
+            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem;">History</h3>
+            <div id="oil-history-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+            <div id="oil-history-empty" style="text-align: center; padding: 2rem 0; color: rgba(255,255,255,0.3); font-size: 0.85rem; display: none;">
+              No oil changes logged yet.
+            </div>
+          </div>
+        </div>
+        <!-- /page-content -->
+      </main>
+    </div>
+
+    
+    <!-- FAB (Mobile Only) -->
+    <button class="fab-add mobile-only" onclick="showPage('add')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 22V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/>
+        <path d="M14 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        <circle cx="18" cy="11" r="3"/>
+        <path d="M15 22v-5"/>
+        <path d="M21 22v-5"/>
+        <path d="M7 12h4"/>
+        <path d="M9 10v4"/>
+      </svg>
+    </button>
+    <!-- BOTTOM NAV (mobile) -->
+    <nav class="bottom-nav">
+      <button
+        class="bnav-item active"
+        id="bnav-dashboard"
+        onclick="showPage('dashboard')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        Dash
+      </button>
+      <button class="bnav-item" id="bnav-add" onclick="showPage('add')">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="16" />
+          <line x1="8" y1="12" x2="16" y2="12" />
+        </svg>
+        Add
+      </button>
+      <button class="bnav-item" id="bnav-history" onclick="showPage('history')">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        History
+      </button>
+      <button class="bnav-item" id="bnav-stats" onclick="showPage('stats')">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+        Stats
+      </button>
+      
+    </nav>
+
+    <!-- ── CONFIRM MODAL ── -->
+    <div class="modal-backdrop" id="modal">
+      <div class="modal-box">
+        <div class="glass-strong rounded-3xl p-5">
+          <h3
+            id="modal-title"
+            style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem"
+          ></h3>
+          <p
+            id="modal-msg"
+            style="
+              font-size: 0.8rem;
+              color: rgba(255, 255, 255, 0.45);
+              margin-bottom: 1.25rem;
+              line-height: 1.6;
+            "
+          ></p>
+          <div style="display: flex; gap: 0.625rem">
+            <button class="btn-ghost" style="flex: 1" onclick="closeModal()">
+              Cancel
+            </button>
+            <button
+              id="modal-confirm-btn"
+              style="
+                flex: 1;
+                border-radius: 0.875rem;
+                padding: 0.75rem;
+                font-size: 0.875rem;
+                font-weight: 700;
+                background: rgba(255, 70, 70, 0.18);
+                border: 1px solid rgba(255, 70, 70, 0.3);
+                color: var(--danger);
+                transition: background 0.2s;
+              "
+              onmouseover="this.style.background = 'rgba(255,70,70,0.28)'"
+              onmouseout="this.style.background = 'rgba(255,70,70,0.18)'"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    
+  
+    <script src='app.js' defer></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js');
+        });
+      }
+    </script>
+  </body>
+</html>
