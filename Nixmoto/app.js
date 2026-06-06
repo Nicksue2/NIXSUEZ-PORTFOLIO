@@ -28,6 +28,9 @@
           console.warn('Init error:', e.message);
         } finally {
           renderAll();
+          // Hide loader
+          const loader = document.getElementById('loader');
+          if (loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 400); }
         }
       }
 
@@ -111,10 +114,7 @@
         showCfgStatus("Testing…", "rgba(255,255,255,0.4)");
         try {
           const { error } = await supabaseClient.from(TABLE).select("id").limit(1);
-          if (error) {
-                console.warn("Supabase oil save failed:", error.message);
-                showToast("Saved locally (Supabase table missing)", false);
-              } else
+          if (error) throw error;
           showCfgStatus("✓ Connected successfully!", "var(--good)");
           showToast("Connection OK ✓");
         } catch (e) {
@@ -128,6 +128,7 @@
 
       function showCfgStatus(msg, color) {
         const el = document.getElementById("cfg-status");
+        if (!el) return;
         el.textContent = msg;
         el.style.color = color;
         el.style.display = "block";
@@ -878,8 +879,11 @@
         try {
           if (supabaseClient) {
             const { data, error } = await supabaseClient.from("oil_logs").insert([record]).select().single();
-            if (error) throw error;
-            record.id = data.id;
+            if (error) {
+              console.warn("Supabase oil save failed:", error.message);
+            } else {
+              record.id = data.id;
+            }
           }
           oilLogs.push(record);
           sortOilLogs();
