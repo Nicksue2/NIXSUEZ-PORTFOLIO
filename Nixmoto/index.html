@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
@@ -17,8 +14,8 @@
       content="Fuel consumption tracker — Yamaha Mio Sporty"
     />
     <title>NixMoto</title>
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="icon512.png" />
+    <link rel="manifest" href="/Nixmoto/manifest.json" />
+    <link rel="apple-touch-icon" href="/Nixmoto/icon512.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,7 +36,7 @@
         },
       };
     </script>
-    <link rel='stylesheet' href='style.css' />
+    <link rel='stylesheet' href='/Nixmoto/style.css' />
   </head>
   <body>
     <!-- ── LOADER ── -->
@@ -1042,11 +1039,11 @@
     <!-- ═══════════════════════════════════════════════════════════ -->
     
   
-    <script src='app.js' defer></script>
+    <script src='/Nixmoto/app.js' defer></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js');
+          navigator.serviceWorker.register('/Nixmoto/sw.js');
         });
       }
     </script>

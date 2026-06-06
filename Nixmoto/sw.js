@@ -1,11 +1,11 @@
 const CACHE_NAME = 'nixmoto-v1';
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './manifest.json',
-  './icon512.png',
+  '/Nixmoto/',
+  '/Nixmoto/index.html',
+  '/Nixmoto/style.css',
+  '/Nixmoto/app.js',
+  '/Nixmoto/manifest.json',
+  '/Nixmoto/icon512.png',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@300;400;500&display=swap'

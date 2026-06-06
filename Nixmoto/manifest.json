@@ -2,13 +2,13 @@
   "name": "NixMoto",
   "short_name": "NixMoto",
   "description": "Fuel consumption tracker",
-  "start_url": "./index.html",
+  "start_url": "/Nixmoto/",
   "display": "standalone",
   "background_color": "#0d1113",
   "theme_color": "#2dd4bf",
   "icons": [
     {
-      "src": "icon512.png",
+      "src": "/Nixmoto/icon512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
