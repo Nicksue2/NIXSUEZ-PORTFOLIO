@@ -111,7 +111,10 @@
         showCfgStatus("Testing…", "rgba(255,255,255,0.4)");
         try {
           const { error } = await supabaseClient.from(TABLE).select("id").limit(1);
-          if (error) throw error;
+          if (error) {
+                console.warn("Supabase oil save failed:", error.message);
+                showToast("Saved locally (Supabase table missing)", false);
+              } else
           showCfgStatus("✓ Connected successfully!", "var(--good)");
           showToast("Connection OK ✓");
         } catch (e) {
@@ -812,18 +815,7 @@
         toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
       }
 
-      // Load settings fields if previously saved
-      function loadSettingsFields() {
-        const cfg = getSupabaseConfig();
-        if (cfg) {
-          document.getElementById("cfg-url").value = cfg.url || "";
-          document.getElementById("cfg-key").value = cfg.key || "";
-          showCfgStatus(
-            "Config loaded from storage.",
-            "rgba(255,255,255,0.35)",
-          );
-        }
-      }
+      
 
       // ─── START ───────────────────────────────────────────────────
       document.addEventListener("DOMContentLoaded", () => {
