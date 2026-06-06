@@ -929,14 +929,17 @@
           document.getElementById("oil-since-km").textContent = "-- km";
           document.getElementById("oil-remaining-km").textContent = "-- km";
           document.getElementById("oil-progress-bar").style.width = "0%";
+          // Hide dashboard warning
+          const dashOilWarn = document.getElementById("dash-oil-warning");
+          if (dashOilWarn) dashOilWarn.style.display = "none";
           return;
         }
 
         emptyEl.style.display = "none";
 
         // Dashboard calculation
-        const lastOil = oilLogs[0]; // because it's sorted descending
-        // Find latest fuel log odo
+        const lastOil = oilLogs[0]; // sorted descending by odo
+        // Auto-detect current odo from latest fuel log
         let currentOdo = lastOil.odometer;
         if (logs.length > 0) {
           const lastFuel = logs[logs.length - 1]; // fuel logs are ascending
@@ -951,11 +954,36 @@
         
         const remEl = document.getElementById("oil-remaining-km");
         remEl.textContent = remaining.toFixed(1) + " km";
-        remEl.style.color = remaining <= 0 ? "var(--danger)" : remaining <= 150 ? "var(--warn)" : "#fff";
+        // Color code: red if overdue, orange if ≤10km, yellow if ≤150km
+        remEl.style.color = remaining <= 0 ? "var(--danger)" : remaining <= 10 ? "#ff6b35" : remaining <= 150 ? "var(--warn)" : "#fff";
 
         const bar = document.getElementById("oil-progress-bar");
         bar.style.width = pct + "%";
-        bar.style.background = remaining <= 0 ? "var(--danger)" : remaining <= 150 ? "var(--warn)" : "var(--accent)";
+        bar.style.background = remaining <= 0 ? "var(--danger)" : remaining <= 10 ? "#ff6b35" : remaining <= 150 ? "var(--warn)" : "var(--accent)";
+
+        // Show warning on dashboard if ≤10km remaining
+        const dashOilWarn = document.getElementById("dash-oil-warning");
+        if (dashOilWarn) {
+          if (remaining <= 0) {
+            dashOilWarn.style.display = "block";
+            dashOilWarn.style.background = "rgba(255,60,60,0.12)";
+            dashOilWarn.style.borderColor = "rgba(255,60,60,0.3)";
+            dashOilWarn.innerHTML = `<span style="color:var(--danger);font-weight:700;">⚠ OVERDUE</span> <span style="color:rgba(255,255,255,0.6);">Change oil now! ${Math.abs(remaining).toFixed(0)}km past due</span>`;
+          } else if (remaining <= 10) {
+            dashOilWarn.style.display = "block";
+            dashOilWarn.style.background = "rgba(255,107,53,0.12)";
+            dashOilWarn.style.borderColor = "rgba(255,107,53,0.3)";
+            dashOilWarn.innerHTML = `<span style="color:#ff6b35;font-weight:700;">⚠ WARNING</span> <span style="color:rgba(255,255,255,0.6);">Only ${remaining.toFixed(1)}km until oil change!</span>`;
+          } else {
+            dashOilWarn.style.display = "none";
+          }
+        }
+
+        // Auto-fill odo field with latest known odo for convenience
+        const oilOdoField = document.getElementById("oil-odo");
+        if (oilOdoField && !oilOdoField.value) {
+          oilOdoField.placeholder = currentOdo.toLocaleString();
+        }
 
         // History
         listEl.innerHTML = oilLogs.map((l, i) => `
